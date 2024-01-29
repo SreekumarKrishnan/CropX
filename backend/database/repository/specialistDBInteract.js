@@ -1,6 +1,7 @@
 import Specialist from "../models/specialistSchema.js";
 import Specialization from "../models/specializationSchema.js"
 import { passwordHash } from "../../services/bcryptService.js";
+import {ObjectId}  from "mongodb"
 
 const findSpecialist = async (findData) => {
   try {
@@ -14,7 +15,7 @@ const findSpecialist = async (findData) => {
 
 const findSpecialistById = async (findData)=>{
   try {
-    const user = await Specialist.findById(findData);
+    const user = await Specialist.findById(findData).select("-password").populate('specialization');;
 
     return user;
   } catch (error) {
@@ -111,6 +112,43 @@ const updateExperience = async (id,data)=>{
     console.error(error)
   }
 }
+const deleteExperienceList = async (id,data)=>{
+  try {
+    
+    await Specialist.findByIdAndUpdate({_id:id},{
+      $pull: { experiences :{startDate:data}   }
+    },
+    { new: true }
+    )
+    
+  } catch (error) {
+    console.error(error)
+  }
+}
+const updateSlot = async (id,data)=>{
+  try {
+    
+    await Specialist.findByIdAndUpdate({_id:id}, {$push:{slot:data}})
+    
+  } catch (error) {
+    console.error(error)
+  }
+}
+const deleteSlotList = async (id,data1,data2)=>{
+  try {
+    
+    await Specialist.findByIdAndUpdate({_id:id},{
+      $pull: { slot :{slotDate:data1, slotTime:data2 } }
+    },
+    { new: true }
+    )
+    
+  } catch (error) {
+    console.error(error)
+  }
+} 
+
+
 
 export {
   findSpecialist,
@@ -120,5 +158,8 @@ export {
   updateSpecialist,
   findSpecialistById,
   updateSpecialistById,
-  updateExperience
+  updateExperience,
+  deleteExperienceList,
+  updateSlot,
+  deleteSlotList
 };

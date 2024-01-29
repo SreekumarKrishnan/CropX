@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import axiosInstance from "../../axiosConfig";
 import { toast } from "react-toastify";
 
-const AddExperience = ({ user }) => {
-  console.log(user, "++++++++++++++++");
+const AddExperience = ({ user, userRefetch }) => {
+  
   const [experience, setExperience] = useState({
     organization: "",
     position: "",
@@ -34,20 +34,33 @@ const AddExperience = ({ user }) => {
         startDate: "",
         endDate: "",
       });
-
+      userRefetch()
       toast.success(result.message);
       navigate("/specialist/profile");
     } catch (error) {
       toast.error(error.response.data.message);
     }
+    
   };
 
-  const handleDelete = async()=>{
+  const handleDelete = async(index)=>{
+    const data = user.experiences[index]
+    
     try {
-      
+       
+      const res = await axiosInstance.put(
+        `/specialist/deleteExperience/${user._id}`,
+        data
+      );
+
+      const result = res.data;
+      userRefetch()
+      toast.success(result.message);
+      navigate("/specialist/profile");
     } catch (error) {
-      
+      toast.error(error.response.data.message);
     }
+    
   }
 
   return (
@@ -146,7 +159,7 @@ const AddExperience = ({ user }) => {
                         <td className="px-6 py-4">{experience.endDate}</td>
                         <td className="px-6 py-4">
                           <button
-                            onClick={() => handleDelete(index)} 
+                            onClick={()=>handleDelete(index)} 
                             className="px-4 py-2 font-semibold text-white bg-red-500 border border-yellow-500 rounded hover:bg-yellow-500 hover:text-white hover:border-transparent"
                           >
                             Delete

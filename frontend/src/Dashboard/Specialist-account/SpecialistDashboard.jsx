@@ -4,10 +4,11 @@ import MyAppointments from "./MyAppointments";
 import Profile from "./Profile";
 import useGetProfile from "../../hooks/UseFetchAllSpecialistData"
 import AddExperience from "./AddExperience";
+import AddSlot from "./AddSlot"
 
 const SpecialistDashboard = () => {
   const [tab, setTab] = useState("appointments");
-  const { specialistData : userData, loading, error } = useGetProfile("/specialist/profile")
+  const { specialistData : userData, refetch: userRefetch } = useGetProfile("/specialist/profile")
   return (
     <section>
       <div className="max-w-[1170px] px-5 mx-auto">
@@ -55,15 +56,24 @@ const SpecialistDashboard = () => {
                 onClick={() => setTab("settings")}
                 className={`${
                   tab === "settings" && "bg-primaryColor text-white font-normal"
-                } py-2 px-5 rounded-md text-headingColor font-semibold text-[16px] leading-7 border border-solid border-primaryColor`}
+                } py-2 px-5 rounded-md text-headingColor font-semibold text-[16px] leading-7 border border-solid border-primaryColor mr-5`}
               >
                 Profile Setting
+              </button>
+              <button
+                onClick={() => setTab("slots")}
+                className={`${
+                  tab === "slots" && "bg-primaryColor text-white font-normal"
+                } py-2 px-5 rounded-md text-headingColor font-semibold text-[16px] leading-7 border border-solid border-primaryColor`}
+              >
+                Slots
               </button>
             </div>
 
             {tab === "bookings" && <MyAppointments />}
-            {tab === "experience" && <AddExperience user={userData} />}
+            {tab === "experience" && <AddExperience user={userData} userRefetch={userRefetch} />}
             {tab === "settings" && <Profile user={userData} />}
+            {tab === "slots" && <AddSlot user={userData} userRefetch={userRefetch} />}
           </div>
         </div>
       </div>

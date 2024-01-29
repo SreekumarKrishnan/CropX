@@ -1,14 +1,16 @@
 import React from "react";
+import altDp from "../../assets/images/altDp.png"
 import { Link } from "react-router-dom";
 import { BsArrowRight } from "react-icons/bs";
 
 const SpecialistCard = ({ specialist }) => {
   const { _id, fname, lname, photo, qualification, specialization } = specialist;
+  
 
   return (
     <div className="p-3 lg:p-5">
       <div>
-        <img src={photo} className="w-full rounded-lg" alt="" />
+        <img src={photo || altDp} className="w-full rounded-lg" alt={altDp} />
       </div>
       <h2 className="text-[18px] leading-[30px] lg:text-[26px] lg:leading-9 text-headingColor font-[700] mt-3 lg:mt-5">{`${fname} ${lname}`}</h2>
       <div className="mt-2 lg:mt-4 flex items-center justify-between">
