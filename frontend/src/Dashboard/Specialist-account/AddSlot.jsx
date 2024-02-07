@@ -5,16 +5,28 @@ import { toast } from "react-toastify";
 import axiosInstance from "../../axiosConfig"
 
 const AddSlot = ({ user, userRefetch }) => {
+  let count = 1
   const currentDate = new Date();
+  const [color,setColor]=useState(true)
   const [selectedDate, setSelectedDate] = useState(currentDate);
   const [isTimeSlotSelectionOpen, setIsTimeSlotSelectionOpen] = useState(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
-  const [slotData, setSlotData] = useState({
+  const [slotData, setSlotData] = useState([{
     slotDate : "",
-    slotTime : ""
-  })
+    slotTime1 : ""
+  },
+  {
+    slotDate : "",
+    slotTime2 : ""
+  },{
+    slotDate : "",
+    slotTime3 : ""
+  }
+]
+  )
 
   useEffect(() => { 
+    
   }, [slotData]);
 
   const handleDateChange = (date) => {
@@ -25,10 +37,20 @@ const AddSlot = ({ user, userRefetch }) => {
     selectedDate.setHours(18);
     selectedDate.setMinutes(30);
     selectedDate.setSeconds(0);
-    setSlotData({
+    
+    setSlotData([{
         slotDate:selectedDate.toISOString(),
-        slotTime:selectedTimeSlot
-    })
+        slotTime:selectedTimeSlot.timeSlot1
+    },
+    {
+      slotDate:selectedDate.toISOString(),
+      slotTime:selectedTimeSlot.timeSlot2
+  },{
+    slotDate:selectedDate.toISOString(),
+    slotTime:selectedTimeSlot.timeSlot3
+}]
+  )
+    
     
     setSelectedTimeSlot(null);
     setIsTimeSlotSelectionOpen(false);
@@ -37,6 +59,9 @@ const AddSlot = ({ user, userRefetch }) => {
   const handleAddSlot = async()=>{
     try {
       
+      if(slotData.slotTime===""){
+        return toast.error("Please select a time slot before adding the slot.")
+      }
       
       const res = await axiosInstance.put(
         `/specialist/addSlot/${user._id}`,
@@ -44,26 +69,50 @@ const AddSlot = ({ user, userRefetch }) => {
       );
 
       const result = res.data;
-      setSlotData({
+
+      setSlotData([{
         slotDate : "",
-        slotTime : ""
-      })
+        slotTime1 : ""
+      },
+      {
+        slotDate : "",
+        slotTime2 : ""
+      },
+      {
+        slotDate : "",
+        slotTime3 : ""
+      }])
+
+      setColor(true)
+
       userRefetch()
       toast.success(result.message);
       navigate("/specialist/profile");
+      
     } catch (error) {
       toast.error(error.response.data.message);
     }
   }
 
-  const handleDelete = async(index)=>{
-    const data = user.slot[index]
+  
+
+  const handleTimeSlotSelection = (timeSlot1,timeSlot2,timeSlot3) => {
+    setSelectedTimeSlot({
+      timeSlot1:timeSlot1,
+      timeSlot2:timeSlot2,
+      timeSlot3:timeSlot3,
+    });
+    setColor(false)
+  };
+
+  const handleDelete = async(index,index1)=>{
+    const data = user.slot[index][index1]
     
     try {
        
       const res = await axiosInstance.put(
         `/specialist/deleteSlot/${user._id}`,
-        data
+        {data,index}
       );
 
       const result = res.data;
@@ -75,10 +124,6 @@ const AddSlot = ({ user, userRefetch }) => {
     }
     
   }
-
-  const handleTimeSlotSelection = (timeSlot) => {
-    setSelectedTimeSlot(timeSlot);
-  };
 
   
 
@@ -98,16 +143,18 @@ const AddSlot = ({ user, userRefetch }) => {
         <div className="time-slot-selection">
           <h2>Select Time Slot</h2>
           
-          <button className="px-4 py-2 bg-[#ffac4d] text-black rounded-md mr-5" onClick={() => handleTimeSlotSelection('9am-11am')}>9am-11am</button>
-          <button className="px-4 py-2 bg-[#ffac4d] text-black rounded-md mr-5" onClick={() => handleTimeSlotSelection('2pm-4pm')}>2pm-4pm</button>
-          <button className="px-4 py-2 bg-[#ffac4d] text-black rounded-md mr-10" onClick={() => handleTimeSlotSelection('4pm-6pm')}>4pm-6pm</button>
-          <button className="px-4 py-2 bg-green-500 text-white rounded-md mr-10" onClick={handleAddTime}>Add time</button>
-          <button className="px-4 py-2 bg-red-500 text-white rounded-md" onClick={() => setIsTimeSlotSelectionOpen(false)}>Close</button>
+          <button className={`px-4 py-2 ${color?"bg-[#ffac4d]":"bg-[#c4c2c2]"} text-black rounded-md mr-5`} >9am-11am</button>
+          <button className={`px-4 py-2 ${color?"bg-[#ffac4d]":"bg-[#c4c2c2]"} text-black rounded-md mr-5`} >2pm-4pm</button>
+          <button className={`px-4 py-2 ${color?"bg-[#ffac4d]":"bg-[#c4c2c2]"} text-black rounded-md mr-10`} >4pm-6pm</button>
+          <button className="px-4 py-2 bg-yellow-500 text-white rounded-md mr-10" onClick={() => handleTimeSlotSelection('9am-11am','2pm-4pm','4pm-6pm')}>Add time</button>
+          <button className="px-4 py-2 bg-green-500 text-white rounded-md mr-10" onClick={handleAddTime}>Confirm</button>
+          <button className="px-4 py-2 bg-red-500 text-white rounded-md mt-5" onClick={() => setIsTimeSlotSelectionOpen(false)}>Close</button>
         </div>
       )}
       <button
         onClick={handleAddSlot}
         className="px-4 py-2 bg-primaryColor text-white rounded-md mt-5"
+        
       >
         Add slot
       </button>
@@ -140,6 +187,7 @@ const AddSlot = ({ user, userRefetch }) => {
                 <tbody>
                   {user && user.slot.length ? (
                     user.slot.map((slot, index) => (
+                      slot.map((slot,index1)=>(
                       <tr
                         key={index}
                         className="bg-white border-b hover:bg-[#e8e8ff]"
@@ -148,7 +196,7 @@ const AddSlot = ({ user, userRefetch }) => {
                           scope="row"
                           className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
                         >
-                          {index + 1}
+                          {count++}
                         </th>
                         <td className="px-6 py-4">{slot.slotDate.split('T')[0]}</td>
                        
@@ -157,13 +205,14 @@ const AddSlot = ({ user, userRefetch }) => {
                         
                         <td className="px-6 py-4">
                           <button
-                            onClick={()=>handleDelete(index)} 
+                            onClick={()=>handleDelete(index,index1)} 
                             className="px-4 py-2 font-semibold text-white bg-red-500 border border-yellow-500 rounded hover:bg-yellow-500 hover:text-white hover:border-transparent"
                           >
                             Delete
                           </button>
                         </td>
                       </tr>
+                      ))
                     ))
                   ) : (
                     <tr className="bg-white border-b hover:bg-gray-100">

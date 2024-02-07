@@ -15,6 +15,8 @@ import MyAccount from '../Dashboard/User-account/MyAccount'
 import SpecialistDashboard from '../Dashboard/Specialist-account/SpecialistDashboard'
 import ProtectedRoute from './ProtectedRoute'
 import SpecialistDetails from '../pages/Specialists/SpecialistDetails'
+import PaymentSuccess from '../pages/User/PaymentSuccess'
+import PaymentFailed from '../pages/User/PaymentFailed'
 
 
 const Routers = () => {
@@ -35,6 +37,8 @@ const Routers = () => {
       <Route path='/user/profile' element={<ProtectedRoute allowedRoles={["farmer"]}><MyAccount/></ProtectedRoute>} />
       <Route path='/specialist/profile' element={<ProtectedRoute allowedRoles={["specialist"]}><SpecialistDashboard/></ProtectedRoute>} />
       <Route path='/specialist/:id' element={<ProtectedRoute allowedRoles={["farmer"]}><SpecialistDetails/></ProtectedRoute>} />
+      <Route path='/user/paymentSuccess' element={<ProtectedRoute allowedRoles={["farmer"]}><PaymentSuccess/></ProtectedRoute>} />
+      <Route path='/user/paymentFailed' element={<PaymentFailed/>} />
       
     </Routes>
   

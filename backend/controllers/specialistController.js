@@ -132,10 +132,12 @@ export const addSlot = async (req, res) => {
 };
 export const deleteSlot = async (req, res) => {
   const id = req.params.id;
-  const data1 = req.body.slotDate;
-  const data2 = req.body.slotTime
+  const data1 = req.body.data.slotDate;
+  const data2 = req.body.data.slotTime
+  const index = req.body.index
+ 
     
-  await deleteSlotList(id, data1, data2);
+  await deleteSlotList(id, data1, data2, index);
   res.status(200).json({
     success: true,
     message: "successfully deleted slot",

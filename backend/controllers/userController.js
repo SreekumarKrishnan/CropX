@@ -1,4 +1,12 @@
 import { findAllUsers, findUser, updateUser } from "../database/repository/userDBInteact.js";
+import { createBooking } from "../database/repository/bookingDBInteract.js";
+import { findSpecialistById } from "../database/repository/specialistDBInteract.js";
+import { formateDate } from "../../frontend/src/utils/formateDate.js";
+import dotenv from 'dotenv'
+dotenv.config()
+import Stripe from 'stripe'
+const stripe = Stripe(process.env.STRIPE_KEY)
+
 
 export const updateUserData = async (req, res) => {
   const id = req.params.id;
@@ -69,3 +77,79 @@ export const getUserProfile = async(req,res)=>{
     res.status(500).json({success:false, message:"Something went wrong, cannot get"})
   }
 }
+
+export const bookAppointment = async(req,res)=>{
+  
+  const {specialistId , userId, slotDate, slotTime, ticketPrice} = req.body
+  try {
+    const specialist = await findSpecialistById(specialistId)
+    const user = await findUser(userId)
+    const data={
+      specialist,
+      user,
+      slotDate,
+      slotTime,
+      ticketPrice
+    }
+    await createBooking(data) 
+    res
+      .status(200)
+      .json({ success: true, message: "Booking successfully created" });
+    
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Internal server error, Try again" });
+  }
+}
+
+export const makePayment = async (req, res) => {
+  try {
+    const specialist = await findSpecialistById(req.body.specialistId);
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      customer_email: specialist.email,
+      billing_address_collection: 'auto',
+      shipping_address_collection: {
+        allowed_countries: ['US'], 
+      },
+      line_items: [
+        {
+          price_data: {
+            currency: req.body.currency || 'inr',
+            product_data: {
+              name: `Dr.${specialist.fname} ${specialist.lname}`,
+              description: `At ${req.body.slotTime} on ${formateDate(
+                req.body.slotDate.split('T')[0]
+              )}`,
+            },
+            unit_amount: req.body.ticketPrice * 100,
+          },
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      success_url: 'http://localhost:5173/user/paymentSuccess',
+      cancel_url: 'http://localhost:5173/user/paymentFailed',
+    });
+
+    // If the currency is INR, restrict shipping to India
+    if (req.body.currency === 'inr') {
+      session.shipping_address_collection = {
+        allowed_countries: ['IN'],
+      };
+    }
+
+    res.send({ url: session.url });
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .json({ success: false, message: 'Internal server error, Try again' });
+  }
+};
+
+
+
+

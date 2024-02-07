@@ -45,7 +45,9 @@ const SpecialistDetails = () => {
     };
   }, []);
 
-  console.log(specialist);
+  const user = JSON.parse(localStorage.getItem("user"))
+  const userId = user._id
+  
 
   return (
     <div className="max-w-[1170px] px-5 mx-auto">
@@ -80,7 +82,7 @@ const SpecialistDetails = () => {
         </div>
 
         <div>
-          <SidePanel />
+          <SidePanel specialist={specialist} id={id} userId={userId}/>
         </div>
       </div>
     </div>

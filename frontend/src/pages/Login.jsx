@@ -64,7 +64,7 @@ const Login = () => {
       const res = await axiosInstance.post("/auth/login", formData);
       
       const result = res.data;
-      console.log(result, "result");
+      
 
       dispatch({
         type: "LOGIN_SUCCESS",
@@ -79,7 +79,7 @@ const Login = () => {
       toast.success(result.data.message);
       navigate("/home");
     } catch (error) {
-      console.log(error,"Error");
+      
       toast.error(error.response.data.message);
       setLoading(false);
     }

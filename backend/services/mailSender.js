@@ -41,3 +41,61 @@ export const sendOTPEmail = async (toEmail, otp) => {
         throw error; 
     }
 };
+
+export const sendApproveEmail = async (toEmail) => {
+    
+   
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.SENDER_MAIL,
+            pass: process.env.SENDER_PASSWORD, 
+        },
+    });
+
+   
+    const mailOptions = {
+        from: process.env.SENDER_MAIL, 
+        to: toEmail,
+        subject: 'Your Certificate Verification',
+        text: `Your are Approved as a specialist in our Organization. By, CropX Team`,
+    };
+
+    try {
+        
+        await transporter.sendMail(mailOptions);
+        
+    } catch (error) {
+        console.error('Error sending OTP email:', error);
+        throw error; 
+    }
+};
+
+export const sendSuspendEmail = async (toEmail) => {
+    
+   
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.SENDER_MAIL,
+            pass: process.env.SENDER_PASSWORD, 
+        },
+    });
+
+   
+    const mailOptions = {
+        from: process.env.SENDER_MAIL, 
+        to: toEmail,
+        subject: 'Your Certificate Verification',
+        text: `Your are suspended from our Organization. By, CropX Team`,
+    };
+
+    try {
+        
+        await transporter.sendMail(mailOptions);
+        
+    } catch (error) {
+        console.error('Error sending OTP email:', error);
+        throw error; 
+    }
+};

@@ -1,14 +1,18 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import altDp from "../../assets/images/altDp.png";
 import MyBookings from "./MyBookings";
 import Profile from "./Profile";
 import useGetProfile from "../../hooks/UseFetchAllUsersData"
+import useGetBookingData from "../../hooks/UseFetchBookingData"
+import { authContext } from "../../context/AuthContext";
 
 const MyAccount = () => {
+  const {user} = useContext(authContext)
+  const id = user._id
   const [tab, setTab] = useState("bookings");
   const { userData : userData, loading, error } = useGetProfile("/user/profile")
-
-
+  const { bookingData : bookingData, refetch : refetch } = useGetBookingData(`/admin/getBookingDataById/${id}`)
+  
   return (
     <section>
       <div className="max-w-[1170px] px-5 mx-auto">
@@ -54,7 +58,7 @@ const MyAccount = () => {
               </button>
             </div>
 
-            {tab === "bookings" && <MyBookings />}
+            {tab === "bookings" && <MyBookings bookingData={bookingData} refetch={refetch} />}
             {tab === "settings" && <Profile user={userData} />}
           </div>
         </div>

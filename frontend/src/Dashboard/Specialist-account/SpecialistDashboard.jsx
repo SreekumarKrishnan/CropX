@@ -5,10 +5,12 @@ import Profile from "./Profile";
 import useGetProfile from "../../hooks/UseFetchAllSpecialistData"
 import AddExperience from "./AddExperience";
 import AddSlot from "./AddSlot"
+import UseFetchBookingData from "../../hooks/UseFetchBookingData";
 
 const SpecialistDashboard = () => {
   const [tab, setTab] = useState("appointments");
   const { specialistData : userData, refetch: userRefetch } = useGetProfile("/specialist/profile")
+  const { bookingData : bookingData, refetch : refetch } = UseFetchBookingData("/admin/getAllBookingData")
   return (
     <section>
       <div className="max-w-[1170px] px-5 mx-auto">
@@ -37,9 +39,9 @@ const SpecialistDashboard = () => {
           <div className="md:col-span-2 md:px-[30px]">
             <div>
               <button
-                onClick={() => setTab("bookings")}
+                onClick={() => setTab("appointments")}
                 className={`${
-                  tab === "bookings" && "bg-primaryColor text-white font-normal"
+                  tab === "appointments" && "bg-primaryColor text-white font-normal"
                 } p-2 mr-5 px-5 rounded-md text-headingColor font-semibold text-[16px] leading-7 border border-solid border-primaryColor`}
               >
                 My Appointments
@@ -70,7 +72,7 @@ const SpecialistDashboard = () => {
               </button>
             </div>
 
-            {tab === "bookings" && <MyAppointments />}
+            {tab === "appointments" && <MyAppointments bookingData={bookingData} refetch={refetch} />}
             {tab === "experience" && <AddExperience user={userData} userRefetch={userRefetch} />}
             {tab === "settings" && <Profile user={userData} />}
             {tab === "slots" && <AddSlot user={userData} userRefetch={userRefetch} />}

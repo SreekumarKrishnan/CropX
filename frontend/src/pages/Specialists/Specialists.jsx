@@ -4,64 +4,96 @@ import SpecialistCard from "./SpecialistCard";
 import { authContext } from "../../context/AuthContext";
 import axiosInstance from "../../axiosConfig";
 import { toast } from "react-toastify";
+import Sidebar from "./SpecializationSidebar"
 
 const Specialists = () => {
   const [specialists, setSpecialists] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredSpecialists, setFilteredSpecialists] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(1);
+  const [selectedSpecializations, setSelectedSpecializations] = useState([]);
+  const [availableSpecializations, setAvailableSpecializations] = useState([]);
+
+
   const { dispatch } = useContext(authContext);
 
   const handleLogout = () => {
     dispatch({ type: "LOGOUT" });
   };
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
     let isMounted = true;
-  
+
     const fetchData = async () => {
       try {
-        
-        const res = await axiosInstance.get("/specialist/allSpecialists");
-        const result = res.data;
-        
+        const specialistsRes = await axiosInstance.get(
+          "/specialist/allSpecialists"
+        );
+        const specializationsRes = await axiosInstance.get(
+          "/admin/allSpecialization"
+        );
+
+        const specialistsResult = specialistsRes.data.data;
+        const specializationsResult = specializationsRes.data.data;
+
         if (isMounted) {
-          setSpecialists(result.data);
+          setSpecialists(specialistsResult);
+          setFilteredSpecialists(specialistsResult);
+          setAvailableSpecializations(specializationsResult);
         }
       } catch (error) {
         if (isMounted) {
-          if (error.response && error.response.data && error.response.data.message) {
+          if (
+            error.response &&
+            error.response.data &&
+            error.response.data.message
+          ) {
             toast.error(error.response.data.message);
           } else {
             toast.error("An unexpected error occurred.");
           }
         }
-        navigate('/home')
+        navigate("/home");
       }
     };
-  
+
     fetchData();
-  
+
     return () => {
       isMounted = false;
     };
   }, []);
-  
 
   const handleSearch = () => {
     const filtered = specialists.filter(
       (specialist) =>
-        specialist.fname.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        specialist.lname.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        specialist.specialization.name.toLowerCase().includes(searchQuery.toLowerCase())
+        // existing conditions
+        (specialist.fname.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          specialist.lname.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          specialist.specialization.name.toLowerCase().includes(searchQuery.toLowerCase())) &&
+        // new condition for specialization filter
+        (selectedSpecializations.length === 0 || selectedSpecializations.includes(specialist.specialization.name))
     );
     setFilteredSpecialists(filtered);
+    setCurrentPage(1);
   };
+  
 
   useEffect(() => {
     handleSearch();
-  }, [searchQuery, specialists]);
+  }, [searchQuery, specialists, selectedSpecializations]);
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredSpecialists.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <>
@@ -76,27 +108,74 @@ const Specialists = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            
           </div>
         </div>
       </section>
 
-      <section>
-        <div className="container">
+      <section className="flex flex-wrap">
+
+      <div className="hidden md:block md:w-1/4">
+          <Sidebar
+            availableSpecializations={availableSpecializations}
+            selectedSpecializations={selectedSpecializations}
+            setSelectedSpecializations={setSelectedSpecializations}
+          />
+        </div>
+
+        <div className="container md:w-3/4">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-            {filteredSpecialists.length > 0
-              ? filteredSpecialists.map((specialist) => (
-                  <SpecialistCard
-                    key={specialist._id}
-                    specialist={specialist}
-                  />
-                ))
-              : specialists.map((specialist) => (
-                  <SpecialistCard
-                    key={specialist._id}
-                    specialist={specialist}
-                  />
-                ))}
+            {currentItems.map((specialist) => (
+              <SpecialistCard key={specialist._id} specialist={specialist} />
+            ))}
+          </div>
+
+          {/* Pagination */}
+          <div className="mt-4 flex justify-center items-center">
+            <button
+              onClick={() => paginate(currentPage - 1)}
+              className={`page-link ${
+                currentPage === 1 ? "disabled" : ""
+              } mr-5`}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </button>
+
+            <ul className="pagination flex space-x-2">
+              {Array.from({
+                length: Math.ceil(filteredSpecialists.length / itemsPerPage),
+              }).map((_, index) => (
+                <li
+                  key={index}
+                  className={`page-item ${
+                    index + 1 === currentPage ? "active" : ""
+                  }`}
+                >
+                  <button
+                    onClick={() => paginate(index + 1)}
+                    className="page-link"
+                  >
+                    {index + 1}
+                  </button>
+                </li>
+              ))}
+            </ul>
+
+            <button
+              onClick={() => paginate(currentPage + 1)}
+              className={`page-link ${
+                currentPage ===
+                Math.ceil(filteredSpecialists.length / itemsPerPage)
+                  ? "disabled"
+                  : ""
+              } ml-5`}
+              disabled={
+                currentPage ===
+                Math.ceil(filteredSpecialists.length / itemsPerPage)
+              }
+            >
+              Next
+            </button>
           </div>
         </div>
       </section>

@@ -13,6 +13,13 @@ import {
   createSpecialization,
   findAllSpecialization,
 } from "../database/repository/specializationDBInteract.js";
+import {
+  sendApproveEmail,
+  sendSuspendEmail
+} from "../services/mailSender.js"
+import {
+  findAllBookingData, findBookingDataById
+} from "../database/repository/bookingDBInteract.js"
 
 export const getAllUsers = async (req, res) => {
   try {
@@ -96,15 +103,19 @@ export const approveSpecialist = async (req, res) => {
     const findData = { _id: id };
 
     const user = await findSpecialist(findData);
+    const {email} = user
+    
 
     if (user.is_Approved === false) {
       const updateData = { is_Approved: true };
       await updateSpecialist(findData, updateData);
+      sendApproveEmail(email)
     }
 
     if (user.is_Approved === true) {
       const updateData = { is_Approved: false };
       await updateSpecialist(findData, updateData);
+      sendSuspendEmail(email)
     }
 
     res
@@ -153,5 +164,35 @@ export const getAllSpecialization = async (req, res) => {
     res
       .status(404)
       .json({ success: false, message: "Specialization Not found" });
+  }
+};
+
+export const getAllBookingData = async (req, res) => {
+  try {
+    
+    const bookingData = await findAllBookingData()
+
+    res
+      .status(200)
+      .json({ success: true, message: "Bookinng data found", data: bookingData });
+  } catch (error) {
+    res
+      .status(404)
+      .json({ success: false, message: "Booking data Not found" });
+  }
+};
+
+export const getBookingDataById = async (req, res) => {
+  const id = req.params.id
+  try {
+    const bookingData = await findBookingDataById(id)
+    res
+      .status(200)
+      .json({ success: true, message: "Bookinng data found", data: bookingData });
+    
+  } catch (error) {
+    res
+      .status(404)
+      .json({ success: false, message: "Booking data Not found" });
   }
 };

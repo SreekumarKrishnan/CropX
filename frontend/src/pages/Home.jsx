@@ -1,8 +1,13 @@
 import React from "react";
 import homeImg1 from "../assets/images/home-img1.jpg";
 import About from "../components/About/About";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
+  const navigate = useNavigate()
+  const redirect = async()=>{
+    navigate('/specialists')
+  }
   return (
     <>
       <section className="hero__section pt-[60px] 2xl:h-[800px]">
@@ -14,7 +19,7 @@ const Home = () => {
                   Join us on your journey to be a better Farmer, we're here to
                   support.
                 </h1>
-                <button className="btn">Request an Appointment</button>
+                <button onClick={redirect} className="btn">Request an Appointment</button>
               </div>
             </div>
             <div className="flex gap-[30px] justify-end">

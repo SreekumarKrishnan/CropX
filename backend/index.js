@@ -10,11 +10,11 @@ const app = express()
 import dotenv from 'dotenv'
 dotenv.config()
 
- 
+  
 const corsOptions = {
     origin:true
 }  
-
+ 
 app.use(express.json())
 app.use(express.urlencoded({extended : true}))
 app.use(cookieParser())

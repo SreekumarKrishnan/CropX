@@ -6,7 +6,9 @@ import {
   blockSpecialist,
   approveSpecialist,
   addSpecialization,
-  getAllSpecialization
+  getAllSpecialization,
+  getAllBookingData,
+  getBookingDataById
 } from "../controllers/adminController.js";
 
 const router = express.Router();
@@ -18,5 +20,7 @@ router.put("/blockSpecialist/:id", blockSpecialist);
 router.put("/approveSpecialist/:id", approveSpecialist);
 router.post("/addSpecialization", addSpecialization)
 router.get("/allSpecialization", getAllSpecialization)
+router.get("/getAllBookingData", getAllBookingData)
+router.get("/getBookingDataById/:id", getBookingDataById)
 
 export default router;

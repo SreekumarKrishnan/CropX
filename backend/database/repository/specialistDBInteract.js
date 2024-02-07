@@ -1,7 +1,7 @@
 import Specialist from "../models/specialistSchema.js";
 import Specialization from "../models/specializationSchema.js"
 import { passwordHash } from "../../services/bcryptService.js";
-import {ObjectId}  from "mongodb"
+
 
 const findSpecialist = async (findData) => {
   try {
@@ -134,19 +134,38 @@ const updateSlot = async (id,data)=>{
     console.error(error)
   }
 }
-const deleteSlotList = async (id,data1,data2)=>{
+const deleteSlotList = async (id, data1, data2, index) => {
   try {
+    const result = await Specialist.findByIdAndUpdate(
+      { _id: id },
+      {
+        $pull: {
+          [`slot.${index}`]: { slotDate: data1, slotTime: data2 }
+        }
+      },
+      { new: true }
+    );
+
+    if (result.slot[index] && result.slot[index].length === 0) {
+      await Specialist.findByIdAndUpdate(
+        { _id: id },
+        {
+          $pull: {
+            slot: { $size: 0 }
+          }
+        },
+        { new: true }
+      );
+    }
     
-    await Specialist.findByIdAndUpdate({_id:id},{
-      $pull: { slot :{slotDate:data1, slotTime:data2 } }
-    },
-    { new: true }
-    )
-    
+
   } catch (error) {
-    console.error(error)
+    console.error(error);
   }
-} 
+};
+
+
+
 
 
 
