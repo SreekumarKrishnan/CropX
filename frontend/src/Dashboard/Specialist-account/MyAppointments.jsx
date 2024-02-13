@@ -1,29 +1,41 @@
 import React, { useEffect, useState } from "react";
 import { formateDate } from "../../utils/formateDate";
+import axiosInstance from "../../axiosConfig"
+import { toast } from "react-toastify";
 
 const MyAppointments = ({ bookingData, refetch }) => {
-  const [statusValue, setStatusValue] = useState("");
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [statusValues, setStatusValues] = useState({}); 
+  const [showDropdowns, setShowDropdowns] = useState({});
 
-  const toggleDropdown = () => {
-    setShowDropdown(!showDropdown);
+  const toggleDropdown = (index) => {
+    setShowDropdowns((prev) => ({ ...prev, [index]: !prev[index] }));
   };
 
-  const cancelBooking = (id) => {
-    setStatusValue("Cancel");
+  const cancelBooking = async(id, specialistId, index) => {
+    setStatusValues((prev) => ({ ...prev, [index]: "Cancel" }));
     try {
-      console.log(id);
+      const res = await axiosInstance.put(
+        `specialist/cancelBooking/${id}/${specialistId}`
+      )
+      const result = res.data
+      toast.success(result.message)
     } catch (error) {
-      console.log(error);
+      toast.error(error.response.data.message);
     }
+    refetch()
   };
-  const completeBooking = (id) => {
-    setStatusValue("Complete");
+  const completeBooking = async(id, index) => {
+    setStatusValues((prev) => ({ ...prev, [index]: "Complete" }));
     try {
-      console.log(id);
+      const res = await axiosInstance.put(
+        `specialist/completeBooking/${id}`
+      )
+      const result = res.data
+      toast.success(result.message)
     } catch (error) {
-      console.log(error);
+      toast.error(error.response.data.message);
     }
+    refetch()
   };
 
   return (
@@ -51,6 +63,9 @@ const MyAppointments = ({ bookingData, refetch }) => {
                   </th>
                   <th scope="col" className="px-6 py-3">
                     Session Status
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Cancelled By
                   </th>
                   <th scope="col" className="px-6 py-3">
                     Action
@@ -84,40 +99,47 @@ const MyAppointments = ({ bookingData, refetch }) => {
                       >
                         {data.status}
                       </td>
+
+                      <td className="px-6 py-4 text-blue-500">
+                        {data.isCancelledBy}
+                      </td>
+                      
                       <td className="px-6 py-4">
                         <div className="flex relative">
                           <button
                             className={`${
-                              showDropdown ? "text-blue-500" : "text-gray-500"
+                              showDropdowns[index]
+                                ? "text-blue-500"
+                                : "text-gray-500"
                             } mr-4`}
-                            onClick={toggleDropdown}
+                            onClick={() => toggleDropdown(index)}
                           >
                             select
                           </button>
-                          {showDropdown && (
-                            <div className="absolute bg-white border rounded shadow-lg mt-2">
+                          {showDropdowns[index] && (
+                            <div className="absolute bg-white border rounded shadow-lg mt-2 z-10">
                               <button
                                 className={`${
-                                  statusValue === "Cancel"
+                                  statusValues[index] === "Cancel"
                                     ? "text-red-500"
                                     : "text-gray-500"
                                 } block px-4 py-2`}
                                 onClick={() => {
-                                  cancelBooking(data.user._id);
-                                  toggleDropdown();
+                                  cancelBooking(data._id, data.specialist._id, index);
+                                  toggleDropdown(index);
                                 }}
                               >
                                 Cancel
                               </button>
                               <button
                                 className={`${
-                                  statusValue === "Complete"
+                                  statusValues[index] === "Complete"
                                     ? "text-green-500"
                                     : "text-gray-500"
                                 } block px-4 py-2`}
                                 onClick={() => {
-                                  completeBooking(data.user._id);
-                                  toggleDropdown();
+                                  completeBooking(data._id, index);
+                                  toggleDropdown(index);
                                 }}
                               >
                                 Complete

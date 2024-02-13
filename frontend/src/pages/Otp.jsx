@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axiosInstance from "../axiosConfig";
@@ -9,6 +9,8 @@ const Otp = () => {
   });
 
   const [validationError, setValidationError] = useState("");
+  const [showResendButton, setShowResendButton] = useState(false);
+  const [countdown, setCountdown] = useState(30);
 
   const navigate = useNavigate();
 
@@ -17,14 +19,10 @@ const Otp = () => {
   };
 
   const validateForm = () => {
-    
     const { otp } = formData;
 
-    if ( !otp ) {
-      setValidationError(
-        "Please Enter otp"
-      );
-
+    if (!otp) {
+      setValidationError("Please Enter otp");
       return false;
     }
 
@@ -36,8 +34,8 @@ const Otp = () => {
     e.preventDefault();
 
     if (!validateForm()) {
-        return;
-      }
+      return;
+    }
 
     try {
       const OTP = localStorage.getItem("otp");
@@ -46,6 +44,7 @@ const Otp = () => {
         toast.error("Invalid otp");
         return;
       }
+
       const registrationData = JSON.parse(
         localStorage.getItem("registrationForm")
       );
@@ -55,21 +54,49 @@ const Otp = () => {
         JSON.stringify(registrationData)
       );
 
-      
-
       localStorage.removeItem("registrationForm");
       localStorage.removeItem("otp");
 
       const { message } = res.data;
 
-      
       toast.success(message);
       navigate("/login");
     } catch (error) {
       localStorage.removeItem("registrationForm");
       localStorage.removeItem("otp");
       toast.error(error.response.data.message);
-      
+    }
+  };
+
+  // useEffect to show the resend button and countdown
+  useEffect(() => {
+    const timerId = setInterval(() => {
+      setCountdown((prevCountdown) => prevCountdown - 1);
+    }, 1000);
+
+    // Set showResendButton to true when the countdown reaches 0
+    if (countdown === 0) {
+      clearInterval(timerId);
+      setShowResendButton(true);
+    }
+
+    return () => clearInterval(timerId); // Cleanup on component unmount
+  }, [countdown]);
+
+  const handleResendOtp = async() => {
+    try {
+      const registrationData = JSON.parse(
+        localStorage.getItem("registrationForm")
+      );
+      const res = await axiosInstance.post("/auth/sendOtp", registrationData)
+  
+      const result = res.data
+      localStorage.setItem('otp', result.otp)
+      setShowResendButton(false);
+      setCountdown(30); // Reset countdown
+      toast.info("OTP resend successfully")
+    } catch (error) {
+      toast.error(error.response.data.message);
     }
   };
 
@@ -99,7 +126,22 @@ const Otp = () => {
               Verify otp
             </button>
           </div>
+
           {validationError && <p className="text-red-500">{validationError}</p>}
+
+          {showResendButton ? (
+            <div className="mt-4">
+              <button
+                type="button"
+                onClick={handleResendOtp}
+                className="text-primaryColor underline cursor-pointer"
+              >
+                Resend OTP
+              </button>
+            </div>
+          ) : (
+            <p className="mt-4 text-red-500">{`Resend OTP in ${countdown} seconds`}</p>
+          )}
         </form>
       </div>
     </section>

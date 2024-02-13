@@ -18,6 +18,7 @@ const Profile = ({ user }) => {
     specialization: "",
     qualification: "",
     gender: "",
+    fee:null
     
   });
 
@@ -31,6 +32,7 @@ const Profile = ({ user }) => {
       specialization: user.specialization,
       qualification: user.qualification,
       gender: user.gender,
+      fee : user.fee
       
     });
   }, [user]);
@@ -134,6 +136,17 @@ const Profile = ({ user }) => {
             placeholder="Enter Your Phone Number"
             name="mobile"
             value={formData.mobile}
+            onChange={handleInputChange}
+            className="w-full py-3 border-b border-solid border-[#0066ff61] focus:outline-none focus:border-b-primaryColor text-[16px] leading-7 text-headingColor placeholder:text-textColor cursor-pointer"
+          />
+        </div>
+
+        <div className="mb-5">
+          <input
+            type="number"
+            placeholder="Enter fee"
+            name="fee"
+            value={formData.fee}
             onChange={handleInputChange}
             className="w-full py-3 border-b border-solid border-[#0066ff61] focus:outline-none focus:border-b-primaryColor text-[16px] leading-7 text-headingColor placeholder:text-textColor cursor-pointer"
           />

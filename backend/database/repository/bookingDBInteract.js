@@ -26,11 +26,27 @@ export const findAllBookingData = async()=>{
     }
 }
 
-export const findBookingDataById = async(id)=>{
+export const findBookingDataByUserId = async(id)=>{
     const userId = new ObjectId(id)
     try {
         const bookingData = await Booking.aggregate([{$match:{"user._id":userId}}])
         return bookingData
+    } catch (error) {
+        console.log(error);
+    }
+}
+export const findBookingDataByBookingId = async(id)=>{
+    try {
+        const bookingData = await Booking.findById(id)
+        return bookingData
+    } catch (error) {
+        console.log(error);
+    }
+}
+export const findBookingIdAndUpdate = async(id,updateData)=>{
+    try {
+        const updatedData = await Booking.findByIdAndUpdate(id,{$set:updateData},{new:true})
+        return updatedData
     } catch (error) {
         console.log(error);
     }

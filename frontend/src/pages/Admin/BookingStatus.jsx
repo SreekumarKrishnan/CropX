@@ -1,31 +1,17 @@
-import React from "react";
-import { formateDate } from "../../utils/formateDate";
-import axiosInstance from "../../axiosConfig"
-import { toast } from "react-toastify";
+import React, { useState } from 'react'
+import { formateDate } from '../../utils/formateDate'
 
 
-const MyBookings = ({ bookingData, refetch }) => {
-
-  const cancelBooking = async(id, userId) => {
-    
-    try {
-      const res = await axiosInstance.put(
-        `specialist/cancelBooking/${id}/${userId}`
-      )
-      const result = res.data
-      toast.success(result.message)
-    } catch (error) {
-      toast.error(error.response.data.message);
-    }
-    refetch()
-  };
+const BookingStatus = ({ bookings, specialistRefetch }) => {
+    const [paymentStatus , setPaymentStatus] = useState("Unpaid")
   return (
     <div className="flex flex-col items-center">
-      {/* Navbar Component */}
-      {/* Assuming there's a component named Navbar */}
+    {/* Navbar Component */}
+    {/* Assuming there's a component named Navbar */}
 
+    
       <div className="col-span-3 ">
-        <section className="container" style={{ marginTop: "100px" }}>
+        <section className="container">
           <div className="relative mx-5 overflow-x-auto shadow-md sm:rounded-lg">
             <table className="w-full text-sm text-left text-gray-500">
               <thead className="text-xs text-gray-700 uppercase bg-slate-400">
@@ -34,29 +20,47 @@ const MyBookings = ({ bookingData, refetch }) => {
                     Sl.No
                   </th>
                   <th scope="col" className="px-6 py-3">
+                    Farmer Name
+                  </th>
+
+                  <th scope="col" className="px-6 py-3">
+                    Specialist Name
+                  </th>
+
+                  <th scope="col" className="px-6 py-3">
                     Appointment Date
                   </th>
 
                   <th scope="col" className="px-6 py-3">
                     Appointment Time
                   </th>
+
                   <th scope="col" className="px-6 py-3">
-                    Status
+                    Fee
                   </th>
+
+                  <th scope="col" className="px-6 py-3">
+                    Fee Status
+                  </th>
+
+                  <th scope="col" className="px-6 py-3">
+                    Session Status
+                  </th>
+
                   <th scope="col" className="px-6 py-3">
                     Cancelled By
                   </th>
-                  <th scope="col" className="px-6 py-3">
-                    Action
-                  </th>
+                  
+                 
+                  
                 </tr>
               </thead>
               <tbody>
-                {bookingData && bookingData.length ? (
-                  bookingData.map((data, index) => (
+                {bookings && bookings.length > 0 ? (
+                  bookings.map((data, index) => (
                     <tr
-                      key={index}
                       className="bg-white border-b hover:bg-[#e8e8ff]"
+                      key={data._id}
                     >
                       <th
                         scope="row"
@@ -64,11 +68,23 @@ const MyBookings = ({ bookingData, refetch }) => {
                       >
                         {index + 1}
                       </th>
-                      <td className="px-6 py-4">
-                        {formateDate(data.appointmentDate.split("T")[0])}
-                      </td>
+                      <td className="px-6 py-4">{`${data.user.fname} ${data.user.lname}`}</td>
+
+                      <td className="px-6 py-4">{`${data.specialist.fname} ${data.specialist.lname}`}</td>
+
+                      <td className="px-6 py-4">{formateDate(data.appointmentDate.split("T")[0])}</td>
 
                       <td className="px-6 py-4">{data.appointmentTime}</td>
+
+                      <td className="px-6 py-4">{data.specialist.fee}</td>
+
+                      <td
+                        className={`px-6 py-4 ${
+                          data.isPaid === true && "text-green-500"
+                        }`}
+                      >
+                        {data.isPaid ? "Paid" : "Unpaid"}
+                      </td>
 
                       <td
                         className={`px-6 py-4 ${
@@ -82,35 +98,32 @@ const MyBookings = ({ bookingData, refetch }) => {
 
                       <td className="px-6 py-4 text-blue-500">
                         {data.isCancelledBy}
-                      </td>
+                      </td> 
                       
-                      <td className="px-6 py-4">
-                        <button
-                          onClick={() => cancelBooking(data._id, data.user._id, index)}
-                          className="px-4 py-2 font-semibold text-white bg-red-500 border border-yellow-500 rounded hover:bg-yellow-500 hover:text-white hover:border-transparent"
-                        >
-                          Cancel
-                        </button>
-                      </td>
+                      
+                      
+                      
                     </tr>
                   ))
                 ) : (
                   <tr className="bg-white border-b hover:bg-gray-100">
                     <td
-                      colSpan={6} // Fix the colspan value to match the number of columns
+                      colSpan={5}
                       className="px-6 py-4 font-medium text-center text-gray-900"
                     >
-                      No Appontments found
+                      No users Found
                     </td>
                   </tr>
                 )}
               </tbody>
+
+              
             </table>
           </div>
         </section>
       </div>
-    </div>
-  );
-};
+  </div>
+  )
+}
 
-export default MyBookings;
+export default BookingStatus

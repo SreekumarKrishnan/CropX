@@ -10,7 +10,7 @@ const bookingSchema = new mongoose.Schema(
     },
     ticketPrice: { type: String, required: true },
     appointmentDate: {
-      type: Date,
+      type: String,
       required: true,
     },
     appointmentTime: {
@@ -26,9 +26,10 @@ const bookingSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    isCancelled:{
-      type: Boolean,
-      default: true,
+    isCancelledBy:{
+      type: String,
+      enum: ["farmer", "specialist", "none"],
+      default: "none",
     },
     is_Booked: {
       type: Boolean,

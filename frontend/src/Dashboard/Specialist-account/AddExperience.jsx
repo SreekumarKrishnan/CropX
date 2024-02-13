@@ -21,6 +21,18 @@ const AddExperience = ({ user, userRefetch }) => {
 
   const handleAddExperience = async () => {
     try {
+      if(!experience.organization){
+        return toast.error("Please add your organization")
+      }
+      if(!experience.position){
+        return toast.error("Please add your position")
+      }
+      if(!experience.startDate){
+        return toast.error("Please add your start date of experience")
+      }
+      if(!experience.endDate){
+        return toast.error("Please add your final date of experience")
+      }
       const res = await axiosInstance.put(
         `/specialist/addExperience/${user._id}`,
         experience

@@ -18,7 +18,7 @@ import {
   sendSuspendEmail
 } from "../services/mailSender.js"
 import {
-  findAllBookingData, findBookingDataById
+  findAllBookingData, findBookingDataByUserId
 } from "../database/repository/bookingDBInteract.js"
 
 export const getAllUsers = async (req, res) => {
@@ -182,10 +182,10 @@ export const getAllBookingData = async (req, res) => {
   }
 };
 
-export const getBookingDataById = async (req, res) => {
+export const getBookingDataByUserId = async (req, res) => {
   const id = req.params.id
   try {
-    const bookingData = await findBookingDataById(id)
+    const bookingData = await findBookingDataByUserId(id)
     res
       .status(200)
       .json({ success: true, message: "Bookinng data found", data: bookingData });

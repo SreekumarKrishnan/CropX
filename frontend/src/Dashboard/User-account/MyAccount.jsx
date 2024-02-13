@@ -12,6 +12,8 @@ const MyAccount = () => {
   const [tab, setTab] = useState("bookings");
   const { userData : userData, loading, error } = useGetProfile("/user/profile")
   const { bookingData : bookingData, refetch : refetch } = useGetBookingData(`/admin/getBookingDataById/${id}`)
+  console.log(userData);
+      
   
   return (
     <section>

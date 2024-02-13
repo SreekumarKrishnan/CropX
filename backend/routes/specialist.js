@@ -7,7 +7,9 @@ import {
   deleteExperience,
   addSlot,
   deleteSlot,
-  getSpecialistProfileById
+  getSpecialistProfileById,
+  cancelBooking,
+  completeBooking
 } from "../controllers/specialistController.js";
 import { authenticate, restrict } from "../auth/verifyToken.js";
 const router = express.Router();
@@ -58,6 +60,18 @@ router.put(
   authenticate,
   restrict(["specialist"]),
   deleteSlot 
+);
+router.put(
+  "/cancelBooking/:id1/:id2",
+  authenticate,
+  restrict(["specialist","farmer"]),
+  cancelBooking 
+);
+router.put(
+  "/completeBooking/:id",
+  authenticate,
+  restrict(["specialist"]),
+  completeBooking 
 );
 
 export default router;

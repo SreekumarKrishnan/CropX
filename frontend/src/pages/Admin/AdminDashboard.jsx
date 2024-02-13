@@ -6,6 +6,8 @@ import { BASE_URL } from '../../config.js';
 import useGetAllUsers from '../../hooks/UseFetchAllUsersData.jsx';
 import useGetAllSpecialists from '../../hooks/UseFetchAllSpecialistData.jsx';
 import useGetAllSpecializations from '../../hooks/UseFetchAllSpecializationData.jsx'
+import BookingStatus from './BookingStatus.jsx';
+import useFetchData from '../../hooks/UseFetchData.jsx';
 
 
 const AdminDashboard = () => {
@@ -14,7 +16,7 @@ const AdminDashboard = () => {
   const { userData: usersData,refetch:userRefetch } = useGetAllUsers("/admin/allUsers");
   const { specialistData: specialistsData,refetch:specialistRefetch } = useGetAllSpecialists('/admin/allSpecialists');
   const { specializationData: specializationData,refetch:specializationRefetch } = useGetAllSpecializations('/admin/allSpecialization')
-
+  const { data : bookingData , refetch : bookingRefetch } = useFetchData("/admin//getAllBookingData")
 
   return (
     <div className="container mx-auto p-6">
@@ -53,6 +55,15 @@ const AdminDashboard = () => {
             Specializations
           </button>
 
+          <button
+            onClick={() => setActiveTab('booking')}
+            className={`${
+              activeTab === 'booking' ? 'bg-gray-500 text-white' : ''
+            } px-4 py-2 rounded-md text-lg font-semibold border border-solid border-gray-500 focus:outline-none flex items-center`}
+          >
+            Booking Status
+          </button>
+
         </div>
       </div>
 
@@ -60,6 +71,7 @@ const AdminDashboard = () => {
         {activeTab === 'users' && <UserManagment users={usersData} userRefetch={userRefetch} />}
         {activeTab === 'specialists' && <SpecialistManagment specialists={specialistsData} specialistRefetch={specialistRefetch}/>}
         {activeTab === 'specializations' && <SpecializationManagement specializations = {specializationData} specializationRefetch = {specializationRefetch} />}
+        {activeTab === 'booking' && <BookingStatus bookings = {bookingData} bookingRefetch = {bookingRefetch} /> }
       </div>
     </div>
   )

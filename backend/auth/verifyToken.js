@@ -6,7 +6,7 @@ import { verifyToken } from "../services/jwtService.js"
 export const authenticate = async(req, res, next)=>{
    
     const authToken = req.headers.authorization
-   
+    
 
     try {
         const token = authToken.split(" ")[1]

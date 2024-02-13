@@ -10,18 +10,18 @@ const app = express()
 import dotenv from 'dotenv'
 dotenv.config()
 
-  
+   
 const corsOptions = {
     origin:true
 }  
  
-app.use(express.json())
+app.use(express.json()) 
 app.use(express.urlencoded({extended : true}))
 app.use(cookieParser())
 app.use(cors(corsOptions))
 app.use('/api/v1/auth', authRoute)
 app.use('/api/v1/admin', adminRoute)
-app.use('/api/v1/specialist', specialistRoute)
+app.use('/api/v1/specialist', specialistRoute) 
 app.use('/api/v1/user', userRoute) 
 
 const port = process.env.PORT

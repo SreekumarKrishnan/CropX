@@ -19,6 +19,7 @@ const SpecialistSchema = new mongoose.Schema({
   experiences: { type : Array },
   slot: {type : Array},
   role: {type: String},
+  fee : {type: Number},
   is_Blocked : {type:Boolean, default:false},
   is_Approved: {
     type: Boolean,
