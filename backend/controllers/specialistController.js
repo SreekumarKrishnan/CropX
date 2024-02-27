@@ -10,8 +10,9 @@ import {
   deleteExperienceList,
   updateSlot,
   deleteSlotList,
+  getSpecialistsCount
 } from "../database/repository/specialistDBInteract.js";
-import { findUser } from "../database/repository/userDBInteact.js";
+
 
 export const displayAllSpecialist = async (req, res) => {
   try {
@@ -153,56 +154,7 @@ export const deleteSlot = async (req, res) => {
     console.error(error);
   }
 };
-export const cancelBooking = async (req, res) => {
-  const id1 = req.params.id1;
-  const userId = req.params.id2;
 
-  try {
-    let user;
-    user = await findUser(userId);
-    if (!user) {
-      user = await findSpecialistById(userId);
-    }
-
-    if (user.role === "farmer") {
-      const updateData1 = { status: "Cancelled", isCancelledBy: "farmer" };
-
-      await findBookingIdAndUpdate(id1, updateData1);
-
-      const bookingData = await findBookingDataByBookingId(id1);
-      const specialist = await findSpecialistById(bookingData.specialist._id)
-       specialist.slot.map(async (slot, index) => {
-        slot.filter(async (item, index1) => {
-          if (
-            item.slotDate === bookingData.appointmentDate &&
-            item.slotTime === bookingData.appointmentTime
-          ) {
-            const updateData = {
-              [`slot.${index}.${index1}.is_Booked`]: false,
-            };
-
-            await updateSpecialistById(specialist._id, updateData);
-          }
-        });
-      });
-    }
-    if (user.role === "specialist") {
-      const updateData1 = { status: "Cancelled", isCancelledBy: "specialist" };
-
-      await findBookingIdAndUpdate(id1, updateData1);
-    }
-
-    res.status(200).json({
-      success: true,
-      message: "successfully cancelled booking",
-    });
-  } catch (error) {
-    console.log(error);
-    res
-      .status(500)
-      .json({ success: false, message: "booking cancellation failed" });
-  }
-};
 export const completeBooking = async (req, res) => {
   const id = req.params.id;
   try {
@@ -219,3 +171,18 @@ export const completeBooking = async (req, res) => {
       .json({ success: false, message: "session completion failed" });
   }
 };
+
+export const getAllSpecialistCount = async (req,res)=>{
+  try {
+    const data = await getSpecialistsCount()
+    res.status(200).json({
+      success: true,
+      message: "got all users count",
+      data: data,
+  });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "fetch all users count failed" });
+  }
+}

@@ -17,6 +17,7 @@ import ProtectedRoute from './ProtectedRoute'
 import SpecialistDetails from '../pages/Specialists/SpecialistDetails'
 import PaymentSuccess from '../pages/User/PaymentSuccess'
 import PaymentFailed from '../pages/User/PaymentFailed'
+import Chat from '../pages/ChatComponents/Chat/Chat'
 
 
 const Routers = () => {
@@ -39,6 +40,7 @@ const Routers = () => {
       <Route path='/specialist/:id' element={<ProtectedRoute allowedRoles={["farmer"]}><SpecialistDetails/></ProtectedRoute>} />
       <Route path='/user/paymentSuccess' element={<ProtectedRoute allowedRoles={["farmer"]}><PaymentSuccess/></ProtectedRoute>} />
       <Route path='/user/paymentFailed' element={<PaymentFailed/>} />
+      <Route path='/chat' element={<Chat/>} />
       
     </Routes>
   

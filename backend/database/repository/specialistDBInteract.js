@@ -163,6 +163,14 @@ const deleteSlotList = async (id, data1, data2, index) => {
     console.error(error);
   }
 };
+const getSpecialistsCount = async()=>{
+  try {
+    const data = await Specialist.find().count()
+    return data
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 
 
@@ -180,5 +188,6 @@ export {
   updateExperience,
   deleteExperienceList,
   updateSlot,
-  deleteSlotList
+  deleteSlotList,
+  getSpecialistsCount
 };

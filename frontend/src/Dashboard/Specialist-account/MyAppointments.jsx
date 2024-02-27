@@ -14,8 +14,8 @@ const MyAppointments = ({ bookingData, refetch }) => {
   const cancelBooking = async(id, specialistId, index) => {
     setStatusValues((prev) => ({ ...prev, [index]: "Cancel" }));
     try {
-      const res = await axiosInstance.put(
-        `specialist/cancelBooking/${id}/${specialistId}`
+      const res = await axiosInstance.patch(
+        `booking/cancelBooking/${id}/${specialistId}`
       )
       const result = res.data
       toast.success(result.message)

@@ -65,6 +65,15 @@ const findAllUsers = async()=>{
   }
 }
 
+const getUsersCount = async()=>{
+  try {
+    const data = await User.find().count()
+    return data
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 
-export { findUser, createUser, findAllUsers, updateUser, findUserByEmail };
+
+export { findUser, createUser, findAllUsers, updateUser, findUserByEmail, getUsersCount };

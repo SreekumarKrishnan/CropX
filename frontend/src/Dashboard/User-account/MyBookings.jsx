@@ -9,8 +9,8 @@ const MyBookings = ({ bookingData, refetch }) => {
   const cancelBooking = async(id, userId) => {
     
     try {
-      const res = await axiosInstance.put(
-        `specialist/cancelBooking/${id}/${userId}`
+      const res = await axiosInstance.patch(
+        `booking/cancelBooking/${id}/${userId}`
       )
       const result = res.data
       toast.success(result.message)

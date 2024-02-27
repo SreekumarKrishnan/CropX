@@ -19,7 +19,7 @@ export const createBooking = async(data)=>{
 
 export const findAllBookingData = async()=>{
     try {
-        const bookingData = await Booking.find()
+        const bookingData = await Booking.find() 
         return bookingData
     } catch (error) {
         console.log(error);
@@ -47,6 +47,38 @@ export const findBookingIdAndUpdate = async(id,updateData)=>{
     try {
         const updatedData = await Booking.findByIdAndUpdate(id,{$set:updateData},{new:true})
         return updatedData
+    } catch (error) {
+        console.log(error);
+    }
+}
+export const bookingPerAppointmentDate = async()=>{
+    try {
+        const data = await Booking.aggregate([{$match:{status:{$ne:"Cancelled"}}},{$group:{_id:"$appointmentDate",totalBookings: { $sum: 1 }}},{$sort:{_id:1}}])
+        return data
+    } catch (error) {
+        console.log(error);
+    }
+}
+export const getBookingsCount = async()=>{
+    try {
+      const data = await Booking.find({"status":{$eq:"Completed"}}).count()
+      return data
+    } catch (error) {
+      console.log(error);
+    }
+}
+export const totalBookingRevenue = async()=>{
+    try {
+        const data = await Booking.aggregate([{$match:{"status":{$ne:"Cancelled"}}},{$group:{_id:null,"totalRevenue":{$sum:{$toInt:"$ticketPrice"}}}}])
+        return data[0].totalRevenue
+    } catch (error) {
+        console.log(error);
+    }
+}
+export const bookingsPerSpecialization = async()=>{
+    try {
+       const data = await Booking.aggregate([{$group:{_id:"$specialist.specialization",appointments:{$push:{status:"$status",ticketprice:"$ticketPrice"}}}},{$unwind: "$appointments"},{$match: {"appointments.status": { $ne: "Cancelled" }}},{$lookup:{from:"specializations",localField:"_id",foreignField:"_id",as:"specialization"}},{$unwind:"$specialization"},{$project:{_id:1,specializationName:"$specialization.name",appointments:"$appointments"}},{$group: {_id: "$_id",specializationName: { $first: "$specializationName" },appointmentCount: { $sum: 1 },totalTicketPrice:{$sum:{$toInt:"$appointments.ticketprice"}}}}])
+       return data 
     } catch (error) {
         console.log(error);
     }

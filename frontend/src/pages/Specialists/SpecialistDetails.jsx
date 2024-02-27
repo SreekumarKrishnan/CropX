@@ -47,6 +47,21 @@ const SpecialistDetails = () => {
 
   const user = JSON.parse(localStorage.getItem("user"))
   const userId = user._id
+
+
+  const handleMessage = async () => {
+    const data = {
+      senderId:userId,
+      receiverId:id
+    }
+    try {
+     const response = await axiosInstance.post("/chat", data)
+     const result = response.data
+     navigate("/chat")
+    } catch (error) {
+      console.error("Error sending message:", error.message);
+    }
+  };
   
 
   return (
@@ -67,8 +82,16 @@ const SpecialistDetails = () => {
                   {specialist.specialization && specialist.specialization.name}
                 </span>
               )}
+              <button 
+                  onClick={handleMessage}
+                  className="flex bg-blue-500 text-white py-2 px-4 rounded mt-6"
+                >
+                  Message
+                </button>
             </div>
+            
           </div>
+          
 
           <div className="mt-[50px] border-b border-solid border-primaryColor">
             <h5 className="py-2 px-5 mr-5 text-[16px] leading-7 text-headingColor font-semibold">

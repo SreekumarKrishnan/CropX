@@ -2,6 +2,7 @@ import {
   findAllUsers,
   findUser,
   updateUser,
+  getUsersCount
 } from "../database/repository/userDBInteact.js";
 import { createBooking } from "../database/repository/bookingDBInteract.js";
 import {
@@ -169,3 +170,18 @@ export const makePayment = async (req, res) => {
       .json({ success: false, message: "Internal server error, Try again" });
   }
 };
+
+export const getAllUsersCount = async (req,res)=>{
+  try {
+    const data = await getUsersCount()
+    res.status(200).json({
+      success: true,
+      message: "got all users count",
+      data: data,
+  });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "fetch all users count failed" });
+  }
+}
