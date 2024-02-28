@@ -2,8 +2,10 @@ import React, { useContext, useState } from "react";
 import altDp from "../../assets/images/altDp.png";
 import MyBookings from "./MyBookings";
 import Profile from "./Profile";
+import WalletHistory from "./WalletHistory";
 import useGetProfile from "../../hooks/UseFetchAllUsersData"
 import useGetBookingData from "../../hooks/UseFetchBookingData"
+import useFetchData from "../../hooks/UseFetchData"
 import { authContext } from "../../context/AuthContext";
 
 const MyAccount = () => {
@@ -12,7 +14,8 @@ const MyAccount = () => {
   const [tab, setTab] = useState("bookings");
   const { userData : userData, loading, error } = useGetProfile("/user/profile")
   const { bookingData : bookingData, refetch : refetch } = useGetBookingData(`/admin/getBookingDataById/${id}`)
- 
+  const { data : walletData , refetch : refetchWallet } = useFetchData(`/wallet/transaction/${id}`)
+  
       
   
   return (
@@ -54,14 +57,23 @@ const MyAccount = () => {
                 onClick={() => setTab("settings")}
                 className={`${
                   tab === "settings" && "bg-primaryColor text-white font-normal"
-                } py-2 px-5 rounded-md text-headingColor font-semibold text-[16px] leading-7 border border-solid border-primaryColor`}
+                } py-2 mr-5 px-5 rounded-md text-headingColor font-semibold text-[16px] leading-7 border border-solid border-primaryColor`}
               >
                 Profile Setting
+              </button>
+              <button
+                onClick={() => setTab("wallet")}
+                className={`${
+                  tab === "wallet" && "bg-primaryColor text-white font-normal"
+                } py-2 px-5 rounded-md text-headingColor font-semibold text-[16px] leading-7 border border-solid border-primaryColor`}
+              >
+                Wallet History
               </button>
             </div>
 
             {tab === "bookings" && <MyBookings bookingData={bookingData} refetch={refetch} />}
             {tab === "settings" && <Profile user={userData} />}
+            {tab === "wallet" && <WalletHistory walletData={walletData} refetch={refetch} />}
           </div>
         </div>
       </div>

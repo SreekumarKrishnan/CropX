@@ -26,3 +26,12 @@ export const refundTowallet = async(data,existingAmount)=>{
         console.log(error);
     }
 }
+
+export const getUserWalletTransaction = async(id)=>{
+    try {
+        const wallet = await Wallet.find({userId:id}).sort({createdAt:1})
+        return wallet
+    } catch (error) {
+        console.log(error);
+    }
+}

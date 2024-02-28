@@ -9,6 +9,7 @@ import userRoute from './routes/user.js'
 import chatRoute from "./routes/chat.js"
 import messageRoute from "./routes/message.js"
 import bookingRoute from "./routes/booking.js"
+import walletRoute from "./routes/wallet.js"
 import http from "http"
 import { Server } from "socket.io"
 
@@ -67,6 +68,7 @@ app.use('/api/v1/user', userRoute)
 app.use('/api/v1/chat', chatRoute)
 app.use('/api/v1/message', messageRoute)
 app.use('/api/v1/booking', bookingRoute ) 
+app.use('/api/v1/wallet', walletRoute )
 
 const port = process.env.PORT
 

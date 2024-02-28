@@ -38,6 +38,10 @@ const MyBookings = ({ bookingData, refetch }) => {
                   </th>
 
                   <th scope="col" className="px-6 py-3">
+                    Specialist Name
+                  </th>
+
+                  <th scope="col" className="px-6 py-3">
                     Appointment Time
                   </th>
                   <th scope="col" className="px-6 py-3">
@@ -67,6 +71,8 @@ const MyBookings = ({ bookingData, refetch }) => {
                       <td className="px-6 py-4">
                         {formateDate(data.appointmentDate.split("T")[0])}
                       </td>
+
+                      <td className="px-6 py-4">{`${data.specialist.fname} ${data.specialist.lname}`}</td>
 
                       <td className="px-6 py-4">{data.appointmentTime}</td>
 
