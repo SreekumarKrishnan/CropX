@@ -6,6 +6,8 @@ import { toast } from "react-toastify";
 const MyAppointments = ({ bookingData, refetch }) => {
   const [statusValues, setStatusValues] = useState({}); 
   const [showDropdowns, setShowDropdowns] = useState({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5);
 
   const toggleDropdown = (index) => {
     setShowDropdowns((prev) => ({ ...prev, [index]: !prev[index] }));
@@ -37,6 +39,12 @@ const MyAppointments = ({ bookingData, refetch }) => {
     }
     refetch()
   };
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = bookingData.slice(indexOfFirstItem, indexOfLastItem);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <div className="flex flex-col items-center">
@@ -73,8 +81,8 @@ const MyAppointments = ({ bookingData, refetch }) => {
                 </tr>
               </thead>
               <tbody>
-                {bookingData && bookingData.length ? (
-                  bookingData.map((data, index) => (
+                {currentItems && currentItems.length ? (
+                  currentItems.map((data, index) => (
                     <tr
                       key={index}
                       className="bg-white border-b hover:bg-[#e8e8ff]"
@@ -162,6 +170,56 @@ const MyAppointments = ({ bookingData, refetch }) => {
                 )}
               </tbody>
             </table>
+
+            {/* Pagination */}
+            <div className="mt-4 flex justify-center items-center">
+              <button
+                onClick={() => paginate(currentPage - 1)}
+                className={`page-link ${
+                  currentPage === 1 ? "disabled" : ""
+                } mr-5`}
+                disabled={currentPage === 1}
+              >
+                {"<<"}
+              </button>
+              <ul className="pagination flex space-x-2">
+                {Array.from({
+                  length: Math.ceil(bookingData.length / itemsPerPage),
+                }).map((_, index) => (
+                  <li
+                    key={index}
+                    className={`page-item ${
+                      index + 1 === currentPage ? "active" : ""
+                    }`}
+                  >
+                    <button
+                      onClick={() => paginate(index + 1)}
+                      className="page-link"
+                    >
+                      {index + 1}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <button
+                onClick={() => paginate(currentPage + 1)}
+                className={`page-link ${
+                  currentPage ===
+                  Math.ceil(bookingData.length / itemsPerPage)
+                    ? "disabled"
+                    : ""
+                } ml-5`}
+                disabled={
+                  currentPage ===
+                  Math.ceil(bookingData.length / itemsPerPage)
+                }
+              >
+                {">>"}
+              </button>
+            </div>
+            {/* Pagination end */}
+
+
           </div>
         </section>
       </div>

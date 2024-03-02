@@ -4,6 +4,9 @@ import altDp from "../../assets/images/altDp.png";
 import { NavLink, Link } from "react-router-dom";
 import { BiMenu } from "react-icons/bi";
 import { authContext } from "../../context/AuthContext";
+import { HiMiniChatBubbleLeftRight } from 'react-icons/hi2'
+
+const icon = <HiMiniChatBubbleLeftRight />
 
 const navLinks = [
   {
@@ -13,10 +16,6 @@ const navLinks = [
   {
     path: "/specialists",
     display: "Find a Specialist",
-  },
-  {
-    path: "/services",
-    display: "Services",
   },
   {
     path: "/contact",
@@ -88,19 +87,7 @@ const Header = () => {
 
           <div className="flex items-center gap-4">
             {token && user ? (
-              <div className="relative">
-                <div onClick={toggleDropdown}>
-                  <Link>
-                    <figure className="w-[35px] h-[35px] rounded-full cursor-pointer">
-                      <img
-                        src={user.photo || altDp}
-                        className="w-full rounded-full"
-                        alt={altDp}
-                      />
-                    </figure>
-                  </Link>
-                </div>
-
+              <div className="relative flex justify-between ">
                 {isDropdownOpen && (
                   <div className="absolute right-0 mt-2 bg-white border border-gray-300 rounded shadow-md w-48">
                     <ul>
@@ -125,14 +112,7 @@ const Header = () => {
                         </li>
                       )}
 
-                      <li>
-                        <Link
-                          to="/services"
-                          className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
-                        >
-                          Services
-                        </Link>
-                      </li>
+                      
                       <li>
                         <Link
                           to="/specialists"
@@ -153,6 +133,30 @@ const Header = () => {
                     </ul>
                   </div>
                 )}
+
+                <div onClick={toggleDropdown}>
+                  <Link>
+                    <figure className="w-[35px] h-[35px] rounded-full cursor-pointer">
+                      <img
+                        src={user.photo || altDp}
+                        className="w-full rounded-full"
+                        alt={altDp}
+                      />
+                    </figure>
+                  </Link>
+                </div>
+
+                <div style={{ marginLeft: '30px'}}>
+                <Link to="/chat" className="text-primaryColor">
+                  <span
+                    role="img"
+                    aria-label="Chat"
+                    style={{ fontSize: "1.5rem" }}
+                  >
+                    {icon}
+                  </span>
+                </Link>
+                </div>
               </div>
             ) : (
               <Link to="/login">

@@ -19,6 +19,7 @@ const  Signup = () => {
     role: "farmer",
     gender: "",
   });
+  
 
   const navigate = useNavigate();
 

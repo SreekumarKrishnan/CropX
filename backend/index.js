@@ -25,6 +25,8 @@ const io = new Server(server, {
   },
 });
 
+
+
 let activeUsers = []; 
 
 io.on("connection", (socket) => {
@@ -50,6 +52,11 @@ io.on("connection", (socket) => {
       io.to(recipientSocket.socketId).emit("receive-message", data);
     }
   });
+
+  socket.on('typing',(id)=>{
+    io.emit('typingSend',{id})
+  })
+ 
 });
 
    

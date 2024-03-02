@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import "./Chatbox.css";
 import axiosInstance from "../../../axiosConfig"
 import {format} from "timeago.js"
+import {io} from 'socket.io-client'
 
 
 const Chatbox = ({ chat, currentUser, setSendMessage, receivedMessage }) => {
@@ -9,6 +10,12 @@ const Chatbox = ({ chat, currentUser, setSendMessage, receivedMessage }) => {
   const [userData, setUserData] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+  const [isTyping,setIsTyping] =  useState(false)
+  const [user,setUser] = useState('')
+  const [receiver,setReceiver] = useState('')
+  
+
+  const socket = io('http://localhost:5000')
 
   
 
@@ -19,6 +26,8 @@ const Chatbox = ({ chat, currentUser, setSendMessage, receivedMessage }) => {
 
   useEffect(() => {
     const userId = chat?.members?.find((id) => id !== currentUser);
+    
+    setUser(userId)
     const getUserData = async () => {
       try {
         const response = await axiosInstance.post("/chat/findUserForChat", JSON.stringify({ userId }))
@@ -62,6 +71,7 @@ const Chatbox = ({ chat, currentUser, setSendMessage, receivedMessage }) => {
       chatId: chat._id,
     };
     const receiverId = chat.members.find((id) => id !== currentUser);
+    setReceiver(receiverId)
     setSendMessage({...message, receiverId});
     
     try {
@@ -86,8 +96,40 @@ const Chatbox = ({ chat, currentUser, setSendMessage, receivedMessage }) => {
     }
   }, [receivedMessage]);
 
+  useEffect(() => {
+    let typingTimeout;
+  
+    socket.on('typingSend', (id) => {
+      const checkId = id.id.user;
+      
+  
+      if (checkId !== user) {
+        
+        setIsTyping(true);
+        clearTimeout(typingTimeout);
+        // Start a new timeout to reset isTyping after a certain duration of inactivity
+        typingTimeout = setTimeout(() => {
+          setIsTyping(false);
+        }, 1000);
+      }
+    });
+  
+    return () => {
+      // Clean up the timeout when the component unmounts or when the user changes
+      clearTimeout(typingTimeout);
+    };
+  }, [user]);
+  
+
+  
+
   const scroll = useRef();
   const imageRef = useRef();
+
+  const typingHandler = ()=>{
+
+    socket.emit('typing',{user})
+  }
   return (
     <>
       <div className="grid  grid-rows-[14vh,68vh,13vh] rounded-md overflow-hidden">
@@ -106,6 +148,11 @@ const Chatbox = ({ chat, currentUser, setSendMessage, receivedMessage }) => {
                   <span className="font-bold text-gray-800">
                     {userData?.fname || userData?.fname }
                   </span>
+                  {
+                    isTyping &&(
+                      <div><span className="text-black">typing...</span></div>
+                    )
+                  }
                 </div>
               </div>
               <hr className="w-11/12 border-t border-gray-300 mt-4" />
@@ -134,6 +181,7 @@ const Chatbox = ({ chat, currentUser, setSendMessage, receivedMessage }) => {
                 onChange={handleChange}
                 placeholder="Type your message..."
                 className="flex-1 h-10 bg-gray-100 rounded px-4 outline-none focus:ring-2 focus:ring-blue-500"
+                onInput={typingHandler}
               />
               <button
                 className="button bg-blue-500 text-white py-2 px-4 rounded ml-2"

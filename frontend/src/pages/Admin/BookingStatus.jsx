@@ -1,15 +1,22 @@
-import React, { useState } from 'react'
-import { formateDate } from '../../utils/formateDate'
-
+import React, { useState } from "react";
+import { formateDate } from "../../utils/formateDate";
 
 const BookingStatus = ({ bookings, specialistRefetch }) => {
-    const [paymentStatus , setPaymentStatus] = useState("Unpaid")
+  const [paymentStatus, setPaymentStatus] = useState("Unpaid");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5);
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = bookings.slice(indexOfFirstItem, indexOfLastItem);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
   return (
     <div className="flex flex-col items-center">
-    {/* Navbar Component */}
-    {/* Assuming there's a component named Navbar */}
+      {/* Navbar Component */}
+      {/* Assuming there's a component named Navbar */}
 
-    
       <div className="col-span-3 ">
         <section className="container">
           <div className="relative mx-5 overflow-x-auto shadow-md sm:rounded-lg">
@@ -50,14 +57,11 @@ const BookingStatus = ({ bookings, specialistRefetch }) => {
                   <th scope="col" className="px-6 py-3">
                     Cancelled By
                   </th>
-                  
-                 
-                  
                 </tr>
               </thead>
               <tbody>
-                {bookings && bookings.length > 0 ? (
-                  bookings.map((data, index) => (
+                {currentItems && currentItems.length > 0 ? (
+                  currentItems.map((data, index) => (
                     <tr
                       className="bg-white border-b hover:bg-[#e8e8ff]"
                       key={data._id}
@@ -72,7 +76,9 @@ const BookingStatus = ({ bookings, specialistRefetch }) => {
 
                       <td className="px-6 py-4">{`${data.specialist.fname} ${data.specialist.lname}`}</td>
 
-                      <td className="px-6 py-4">{formateDate(data.appointmentDate.split("T")[0])}</td>
+                      <td className="px-6 py-4">
+                        {formateDate(data.appointmentDate.split("T")[0])}
+                      </td>
 
                       <td className="px-6 py-4">{data.appointmentTime}</td>
 
@@ -98,11 +104,7 @@ const BookingStatus = ({ bookings, specialistRefetch }) => {
 
                       <td className="px-6 py-4 text-blue-500">
                         {data.isCancelledBy}
-                      </td> 
-                      
-                      
-                      
-                      
+                      </td>
                     </tr>
                   ))
                 ) : (
@@ -116,14 +118,58 @@ const BookingStatus = ({ bookings, specialistRefetch }) => {
                   </tr>
                 )}
               </tbody>
-
-              
             </table>
+
+            {/* Pagination */}
+            <div className="mt-4 flex justify-center items-center">
+              <button
+                onClick={() => paginate(currentPage - 1)}
+                className={`page-link ${
+                  currentPage === 1 ? "disabled" : ""
+                } mr-5`}
+                disabled={currentPage === 1}
+              >
+                {"<<"}
+              </button>
+              <ul className="pagination flex space-x-2">
+                {Array.from({
+                  length: Math.ceil(bookings.length / itemsPerPage),
+                }).map((_, index) => (
+                  <li
+                    key={index}
+                    className={`page-item ${
+                      index + 1 === currentPage ? "active" : ""
+                    }`}
+                  >
+                    <button
+                      onClick={() => paginate(index + 1)}
+                      className="page-link"
+                    >
+                      {index + 1}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <button
+                onClick={() => paginate(currentPage + 1)}
+                className={`page-link ${
+                  currentPage === Math.ceil(bookings.length / itemsPerPage)
+                    ? "disabled"
+                    : ""
+                } ml-5`}
+                disabled={
+                  currentPage === Math.ceil(bookings.length / itemsPerPage)
+                }
+              >
+                {">>"}
+              </button>
+            </div>
+            {/* Pagination end */}
           </div>
         </section>
       </div>
-  </div>
-  )
-}
+    </div>
+  );
+};
 
-export default BookingStatus
+export default BookingStatus;

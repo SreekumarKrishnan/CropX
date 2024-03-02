@@ -5,6 +5,8 @@ import CertificateModal from "./CertificateModal";
 
 const SpecialistManagement = ({ specialists, specialistRefetch }) => {
   const [selectedCertificate, setSelectedCertificate] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5);
 
   const handleCertificateClick = (certificate) => {
     setSelectedCertificate(certificate);
@@ -33,6 +35,12 @@ const SpecialistManagement = ({ specialists, specialistRefetch }) => {
 
     specialistRefetch();
   };
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = specialists.slice(indexOfFirstItem, indexOfLastItem);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <div className="flex flex-col items-center">
@@ -74,8 +82,8 @@ const SpecialistManagement = ({ specialists, specialistRefetch }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {specialists && specialists.length > 0 ? (
-                    specialists.map((specialist, index) => (
+                  {currentItems && currentItems.length > 0 ? (
+                    currentItems.map((specialist, index) => (
                       <tr
                         className="bg-white border-b hover:bg-[#e8e8ff]"
                         key={specialist._id}
@@ -159,6 +167,55 @@ const SpecialistManagement = ({ specialists, specialistRefetch }) => {
                   />
                 )}
               </table>
+
+                  {/* Pagination */}
+            <div className="mt-4 flex justify-center items-center">
+              <button
+                onClick={() => paginate(currentPage - 1)}
+                className={`page-link ${
+                  currentPage === 1 ? "disabled" : ""
+                } mr-5`}
+                disabled={currentPage === 1}
+              >
+                {"<<"}
+              </button>
+              <ul className="pagination flex space-x-2">
+                {Array.from({
+                  length: Math.ceil(specialists.length / itemsPerPage),
+                }).map((_, index) => (
+                  <li
+                    key={index}
+                    className={`page-item ${
+                      index + 1 === currentPage ? "active" : ""
+                    }`}
+                  >
+                    <button
+                      onClick={() => paginate(index + 1)}
+                      className="page-link"
+                    >
+                      {index + 1}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <button
+                onClick={() => paginate(currentPage + 1)}
+                className={`page-link ${
+                  currentPage ===
+                  Math.ceil(specialists.length / itemsPerPage)
+                    ? "disabled"
+                    : ""
+                } ml-5`}
+                disabled={
+                  currentPage ===
+                  Math.ceil(specialists.length / itemsPerPage)
+                }
+              >
+                {">>"}
+              </button>
+            </div>
+            {/* Pagination end */}
+
             </div>
           </section>
         </div>

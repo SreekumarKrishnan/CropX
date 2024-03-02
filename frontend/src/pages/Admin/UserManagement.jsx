@@ -1,9 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { BASE_URL } from "../../config";
 
 import axiosInstance from "../../axiosConfig";
 
 const UserManagement = ({ users, userRefetch }) => {
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5);
+
   const handleBlock = async (id) => {
     try {
       await axiosInstance.put(`/admin/blockUser/${id}`);
@@ -13,6 +17,12 @@ const UserManagement = ({ users, userRefetch }) => {
 
     userRefetch();
   };
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = users.slice(indexOfFirstItem, indexOfLastItem);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <div className="flex flex-col items-center">
@@ -41,8 +51,8 @@ const UserManagement = ({ users, userRefetch }) => {
                 </tr>
               </thead>
               <tbody>
-                {users && users.length > 0 ? (
-                  users.map((user, index) => (
+                {currentItems && currentItems.length > 0 ? (
+                  currentItems.map((user, index) => (
                     <tr
                       className="bg-white border-b hover:bg-[#e8e8ff]"
                       key={user._id}
@@ -87,6 +97,55 @@ const UserManagement = ({ users, userRefetch }) => {
                 )}
               </tbody>
             </table>
+
+            {/* Pagination */}
+            <div className="mt-4 flex justify-center items-center">
+              <button
+                onClick={() => paginate(currentPage - 1)}
+                className={`page-link ${
+                  currentPage === 1 ? "disabled" : ""
+                } mr-5`}
+                disabled={currentPage === 1}
+              >
+                {"<<"}
+              </button>
+              <ul className="pagination flex space-x-2">
+                {Array.from({
+                  length: Math.ceil(users.length / itemsPerPage),
+                }).map((_, index) => (
+                  <li
+                    key={index}
+                    className={`page-item ${
+                      index + 1 === currentPage ? "active" : ""
+                    }`}
+                  >
+                    <button
+                      onClick={() => paginate(index + 1)}
+                      className="page-link"
+                    >
+                      {index + 1}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <button
+                onClick={() => paginate(currentPage + 1)}
+                className={`page-link ${
+                  currentPage ===
+                  Math.ceil(users.length / itemsPerPage)
+                    ? "disabled"
+                    : ""
+                } ml-5`}
+                disabled={
+                  currentPage ===
+                  Math.ceil(users.length / itemsPerPage)
+                }
+              >
+                {">>"}
+              </button>
+            </div>
+            {/* Pagination end */}
+
           </div>
         </section>
       </div>

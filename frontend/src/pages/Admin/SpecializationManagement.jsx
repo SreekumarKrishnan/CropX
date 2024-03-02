@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import axiosInstance from '../../axiosConfig'
+import axiosInstance from "../../axiosConfig";
 import { toast } from "react-toastify";
+import {IoMdCloseCircle} from 'react-icons/io'
 
 const SpecializationManagement = ({
   specializations,
@@ -12,13 +13,15 @@ const SpecializationManagement = ({
     description: "",
   });
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5);
+
+  const icon = <IoMdCloseCircle />
+
   const [validationError, setValidationError] = useState("");
 
   const validateForm = () => {
-    
     const { name, description } = formData;
-
-    
 
     if (!name || !description) {
       setValidationError(
@@ -32,23 +35,31 @@ const SpecializationManagement = ({
     return true; // All validations passed
   };
 
-
-  const handleAddSpecialization = async(e) => {
-    e.preventDefault()
+  const handleAddSpecialization = async (e) => {
+    e.preventDefault();
     if (!validateForm()) {
-        return;
-      }
+      return;
+    }
     try {
-        const res = await axiosInstance.post("/admin/addSpecialization", formData)
-        const result = res.data
-        toast.success(result.message)
+      const res = await axiosInstance.post(
+        "/admin/addSpecialization",
+        formData
+      );
+      const result = res.data;
+      toast.success(result.message);
     } catch (error) {
-        toast.error(error.response.data.message);
+      toast.error(error.response.data.message);
     }
 
-    specializationRefetch()
+    specializationRefetch();
     setIsModalOpen(false);
   };
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = specializations.slice(indexOfFirstItem, indexOfLastItem);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <div className="flex flex-col items-center">
@@ -69,6 +80,14 @@ const SpecializationManagement = ({
           {isModalOpen && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
               <div className="bg-white p-8 max-w-md w-full rounded shadow-md">
+                <div className="flex justify-end mb-4">
+                  <button
+                    onClick={() => setIsModalOpen(false)}
+                    className="text-gray-600 hover:text-gray-800"
+                  >
+                    {icon}
+                  </button>
+                </div>
                 <h2 className="text-2xl font-semibold mb-4">
                   Add Specialization
                 </h2>
@@ -109,11 +128,12 @@ const SpecializationManagement = ({
                   <button
                     type="submit"
                     className="px-4 py-2 bg-green-500 text-white rounded"
-                    
                   >
                     Add Specialization
                   </button>
-                  {validationError && <p className="text-red-500">{validationError}</p>}
+                  {validationError && (
+                    <p className="text-red-500">{validationError}</p>
+                  )}
                 </form>
               </div>
             </div>
@@ -136,8 +156,8 @@ const SpecializationManagement = ({
                   </tr>
                 </thead>
                 <tbody>
-                  {specializations && specializations.length > 0 ? (
-                    specializations.map((specialization, index) => (
+                  {currentItems && currentItems.length > 0 ? (
+                    currentItems.map((specialization, index) => (
                       <tr
                         className="bg-white border-b hover:bg-[#e8e8ff]"
                         key={specialization._id}
@@ -148,7 +168,9 @@ const SpecializationManagement = ({
                         >
                           {index + 1}
                         </th>
-                        <td className="px-6 py-4 w-1/4">{specialization.name}</td>
+                        <td className="px-6 py-4 w-1/4">
+                          {specialization.name}
+                        </td>
 
                         <td className="px-6 py-4">
                           {specialization.description}
@@ -167,6 +189,54 @@ const SpecializationManagement = ({
                   )}
                 </tbody>
               </table>
+
+              {/* Pagination */}
+              <div className="mt-4 flex justify-center items-center">
+                <button
+                  onClick={() => paginate(currentPage - 1)}
+                  className={`page-link ${
+                    currentPage === 1 ? "disabled" : ""
+                  } mr-5`}
+                  disabled={currentPage === 1}
+                >
+                  {"<<"}
+                </button>
+                <ul className="pagination flex space-x-2">
+                  {Array.from({
+                    length: Math.ceil(specializations.length / itemsPerPage),
+                  }).map((_, index) => (
+                    <li
+                      key={index}
+                      className={`page-item ${
+                        index + 1 === currentPage ? "active" : ""
+                      }`}
+                    >
+                      <button
+                        onClick={() => paginate(index + 1)}
+                        className="page-link"
+                      >
+                        {index + 1}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  onClick={() => paginate(currentPage + 1)}
+                  className={`page-link ${
+                    currentPage ===
+                    Math.ceil(specializations.length / itemsPerPage)
+                      ? "disabled"
+                      : ""
+                  } ml-5`}
+                  disabled={
+                    currentPage ===
+                    Math.ceil(specializations.length / itemsPerPage)
+                  }
+                >
+                  {">>"}
+                </button>
+              </div>
+              {/* Pagination end */}
             </div>
           )}
         </section>
