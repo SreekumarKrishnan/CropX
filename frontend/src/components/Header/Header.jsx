@@ -4,9 +4,16 @@ import altDp from "../../assets/images/altDp.png";
 import { NavLink, Link } from "react-router-dom";
 import { BiMenu } from "react-icons/bi";
 import { authContext } from "../../context/AuthContext";
-import { HiMiniChatBubbleLeftRight } from 'react-icons/hi2'
+import { HiMiniChatBubbleLeftRight } from "react-icons/hi2";
+import { MdNotificationsActive } from "react-icons/md";
+import io from "socket.io-client";
+import axiosInstance from "../../axiosConfig";
 
-const icon = <HiMiniChatBubbleLeftRight />
+
+const socket = io("http://localhost:5000");
+
+const icon = <HiMiniChatBubbleLeftRight />;
+const notification = <MdNotificationsActive />;
 
 const navLinks = [
   {
@@ -27,6 +34,8 @@ const Header = () => {
   const headerRef = useRef(null);
   const menuRef = useRef(null);
   const { user, role, token, dispatch } = useContext(authContext);
+
+  const [notifications, setNotifications] = useState([]);
 
   const handleStickyHeader = () => {
     window.addEventListener("scroll", () => {
@@ -49,14 +58,57 @@ const Header = () => {
   const toggleMenu = () => menuRef.current.classList.toggle("show__menu");
 
   const [isDropdownOpen, setDropdownOpen] = useState(false);
+  const [isNotificationOpen, setNotificationOpen] = useState(false);
 
   const toggleDropdown = () => {
     setDropdownOpen(!isDropdownOpen);
   };
 
+  const toggleNotification = () => {
+    setNotificationOpen(!isNotificationOpen);
+   
+    if (isNotificationOpen === true && role === "specialist") {
+      
+      handleSpecialistNotification();
+    }
+  };
+
   const handleLogout = () => {
     dispatch({ type: "LOGOUT" });
     location.reload();
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await axiosInstance.get(
+        `notification/getData/${user._id}`
+      );
+
+      setNotifications(response.data.data);
+    };
+
+    fetchData();
+  }, [notifications]);
+
+  useEffect(() => {
+    socket.on("notify-specialist", (result) => {
+      //setBookingState(true);
+      //setNotificationCount(notifications.length)
+    });
+
+    return () => {
+      socket.off("notify-specialist");
+    };
+  }, []);
+
+  const handleSpecialistNotification = async () => {
+    try {
+      const response = await axiosInstance.patch(
+        `notification/updateSeen/${user._id}`
+      );
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -112,7 +164,6 @@ const Header = () => {
                         </li>
                       )}
 
-                      
                       <li>
                         <Link
                           to="/specialists"
@@ -146,16 +197,79 @@ const Header = () => {
                   </Link>
                 </div>
 
-                <div style={{ marginLeft: '30px'}}>
-                <Link to="/chat" className="text-primaryColor">
-                  <span
-                    role="img"
-                    aria-label="Chat"
-                    style={{ fontSize: "1.5rem" }}
+                <div style={{ marginLeft: "30px" }}>
+                  <Link to="/chat" className="text-primaryColor">
+                    <span
+                      role="img"
+                      aria-label="Chat"
+                      style={{ fontSize: "1.5rem" }}
+                    >
+                      {icon}
+                    </span>
+                  </Link>
+                </div>
+
+                <div style={{ marginLeft: "30px", position: "relative" }}>
+                  <Link
+                    to=""
+                    className="text-primaryColor"
+                    onClick={toggleNotification}
                   >
-                    {icon}
-                  </span>
-                </Link>
+                    <span
+                      role="img"
+                      aria-label="Notification"
+                      style={{ fontSize: "1.5rem" }}
+                    >
+                      {role == "farmer" && (
+                        <span
+                          className="bg-red-500 text-white rounded-full px-2 ml-1"
+                          style={{
+                            position: "absolute",
+                            top: "-5px",
+                            right: "-5px",
+                            fontSize: "0.7rem",
+                          }}
+                        >
+                          {}
+                        </span>
+                      )}
+                      {notification}
+                    </span>
+                    {/* Display notification count */}
+                    {notifications.length > 0 && role == "specialist" && (
+                      <span
+                        className="bg-red-500 text-white rounded-full px-2 ml-1"
+                        style={{
+                          position: "absolute",
+                          top: "-5px",
+                          right: "-5px",
+                          fontSize: "0.7rem",
+                        }}
+                      >
+                        {notifications.length}
+                      </span>
+                    )}
+                  </Link>
+                  {isNotificationOpen && role === "specialist" && (
+                    <>
+                      {notifications.length > 0 ? (
+                        <div className="absolute right-0 mt-2 bg-white border border-gray-300 rounded shadow-md w-48">
+                          {/* Add your notification content here */}
+                          <ul>
+                            {notifications.map((msg) => (
+                              <li key={msg.id}>{msg.message}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ) : (
+                        <div className="absolute right-0 mt-2 bg-white border border-gray-300 rounded shadow-md w-48">
+                          <ul>
+                            <li>No notifications</li>
+                          </ul>
+                        </div>
+                      )}
+                    </>
+                  )}
                 </div>
               </div>
             ) : (

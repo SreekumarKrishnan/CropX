@@ -9,7 +9,6 @@ const UserSchema = new mongoose.Schema({
   password: { type: String, required: true },
   photo: { type: String },
   role: {type: String,},
-  gender: { type: String, enum: ["select", "male", "female", "other"] },
   is_Blocked: { type: Boolean, default: false },
 });
 

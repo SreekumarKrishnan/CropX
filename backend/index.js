@@ -10,6 +10,7 @@ import chatRoute from "./routes/chat.js"
 import messageRoute from "./routes/message.js"
 import bookingRoute from "./routes/booking.js"
 import walletRoute from "./routes/wallet.js"
+import notificationRoute from "./routes/notification.js"
 import http from "http"
 import { Server } from "socket.io"
 
@@ -56,6 +57,10 @@ io.on("connection", (socket) => {
   socket.on('typing',(id)=>{
     io.emit('typingSend',{id})
   })
+
+  socket.on("new-booking",(result)=>{
+    io.emit("notify-specialist",{message:result})
+  })
  
 });
 
@@ -76,6 +81,7 @@ app.use('/api/v1/chat', chatRoute)
 app.use('/api/v1/message', messageRoute)
 app.use('/api/v1/booking', bookingRoute ) 
 app.use('/api/v1/wallet', walletRoute )
+app.use('/api/v1/notification', notificationRoute)
 
 const port = process.env.PORT
 

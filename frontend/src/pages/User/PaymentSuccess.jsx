@@ -1,22 +1,50 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axiosInstance from "../../axiosConfig"
+import io from "socket.io-client"
+import { authContext } from "../../context/AuthContext";
+
+const socket = io("http://localhost:5000")
 
 const PaymentSuccess = () => {
+
+  const { user, role, token, dispatch } = useContext(authContext);
+
+  
+
   const navigate = useNavigate()
   const handleBooking = async () => {
     try {
       const bookingData = JSON.parse(
         localStorage.getItem("bookingData")
       );
-      console.log(bookingData);
+
+      
+      
       const res = await axiosInstance.post(
         "/user/bookAppointment",
         JSON.stringify(bookingData) 
       );
-      localStorage.removeItem("bookingData");
+
+      const data ={
+        userId : bookingData.userId,
+        specialistId : bookingData.specialistId,
+        message : `${user.fname} ${user.lname } booked`
+      }
+
+      const notiResponse = await axiosInstance.post(
+        "/notification/create",
+        data
+      )
+      
+      
       const result = res.data
+
+      socket.emit("new-booking", {result})
+
+      localStorage.removeItem("bookingData");
+
       toast.success(result.message)
       navigate("/user/profile")
     } catch (error) {

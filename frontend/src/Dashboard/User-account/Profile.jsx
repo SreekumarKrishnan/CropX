@@ -15,7 +15,6 @@ const Profile = ({ user }) => {
     password: "",
     photo: null,
     role: "farmer",
-    gender: "",
   });
 
   useEffect(() => {
@@ -25,7 +24,6 @@ const Profile = ({ user }) => {
       email: user.email,
       mobile: user.mobile,
       photo: user.photo,
-      gender: user.gender,
     });
   }, [user]);
 
@@ -128,25 +126,6 @@ const Profile = ({ user }) => {
               className="w-full py-3 border-b border-solid border-[#0066ff61] focus:outline-none focus:border-b-primaryColor text-[16px] leading-7 text-headingColor placeholder:text-textColor cursor-pointer"
             />
           </div>
-
-          <div className="mb-5 flex items-center justify-between">
-            <label className="text-headingColor font-bold text-[16px] leading-7">
-              Gender:
-              <select
-                name="gender"
-                value={formData.gender}
-                onChange={handleInputChange}
-                className="text-textColor font-semibold text-[15px] leading-7 px-4 py-3 focus:outline-none rounded-lg"
-              >
-                <option value="select">Select</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-              </select>
-            </label>
-          </div>
-
-
 
           <div className="mb-5 flex items-center gap-3">
             {formData.photo && (

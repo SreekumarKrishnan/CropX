@@ -5,6 +5,8 @@ import { BASE_URL } from "../config";
 import { toast } from "react-toastify";
 import { authContext } from "../context/AuthContext";
 import axiosInstance from "../axiosConfig";
+import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -29,7 +31,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
 
   const { token, dispatch } = useContext(authContext);
-  
+
   useEffect(() => {
     if (token !== "null") {
       navigate("/");
@@ -37,13 +39,10 @@ const Login = () => {
   }, []);
 
   const validateForm = () => {
-    
-    const { email, password, } = formData;
+    const { email, password } = formData;
 
-    if ( !email || !password ) {
-      setValidationError(
-        "Please fill all the fields for successfull Login"
-      );
+    if (!email || !password) {
+      setValidationError("Please fill all the fields for successfull Login");
 
       return false;
     }
@@ -62,9 +61,8 @@ const Login = () => {
     setLoading(true);
     try {
       const res = await axiosInstance.post("/auth/login", formData);
-      
+
       const result = res.data;
-      
 
       dispatch({
         type: "LOGIN_SUCCESS",
@@ -79,7 +77,6 @@ const Login = () => {
       toast.success(result.data.message);
       navigate("/home");
     } catch (error) {
-      
       toast.error(error.response.data.message);
       setLoading(false);
     }
@@ -112,7 +109,6 @@ const Login = () => {
               value={formData.password}
               onChange={handleInputChange}
               className="w-full py-3 pr-12 border-b border-solid border-[#0066ff61] focus:outline-none focus:border-b-primaryColor text-[16px] leading-7 text-headingColor placeholder:text-textColor"
-              
             />
             <div className="absolute inset-y-0 right-0 flex items-center pr-3">
               <button
@@ -125,7 +121,7 @@ const Login = () => {
             </div>
           </div>
 
-          <div className="mt-7">
+          <div className="mt-7 mb-5">
             <button
               type="submit"
               className="w-full bg-primaryColor text-white text-[18px] leading-[30px] rounded-lg"
@@ -133,6 +129,52 @@ const Login = () => {
               Log in
             </button>
           </div>
+
+          <GoogleOAuthProvider clientId="665919114471-3kgrus9ohk8pqq07a5d0hovma3bt5244.apps.googleusercontent.com">
+            <GoogleLogin
+              onSuccess={(credentialResponse) => {
+                if (credentialResponse) {
+                  const decoded = jwtDecode(credentialResponse.credential);
+                  const data = {
+                    email: decoded.email,
+                    password: decoded.sub,
+                  };
+
+                  const reg = async () => {
+                    try {
+                      const res = await axiosInstance.post(
+                        "/auth/login",
+                        data
+                      );
+
+                      const result = res.data;
+
+                      dispatch({
+                        type: "LOGIN_SUCCESS",
+                        payload: {
+                          user: result.data,
+                          role: result.data.role,
+                          token: result.data.token,
+                        },
+                      });
+
+                      setLoading(false);
+                      toast.success(result.data.message);
+                      navigate("/home");
+                    } catch (error) {
+                      toast.error(error.response.data.message);
+                      setLoading(false);
+                    }
+                  };
+
+                  reg();
+                }
+              }}
+              onError={() => {
+                console.log("Registration Failed");
+              }}
+            />
+          </GoogleOAuthProvider>
 
           <p className="mt-5 text-textColor text-center">
             Are you a new user?

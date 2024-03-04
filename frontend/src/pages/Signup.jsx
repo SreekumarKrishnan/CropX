@@ -7,8 +7,10 @@ import { BASE_URL } from "../config";
 import { toast } from "react-toastify";
 import HashLoader from "react-spinners/HashLoader";
 import axiosInstance from "../axiosConfig";
+import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
 
-const  Signup = () => {
+const Signup = () => {
   const [formData, setFormData] = useState({
     fname: "",
     lname: "",
@@ -17,9 +19,7 @@ const  Signup = () => {
     password: "",
     photo: null,
     role: "farmer",
-    gender: "",
   });
-  
 
   const navigate = useNavigate();
 
@@ -47,12 +47,9 @@ const  Signup = () => {
   };
 
   const validateForm = () => {
-    
-    const { fname, lname, email, password, mobile, gender, role } = formData;
+    const { fname, lname, email, password, mobile, role } = formData;
 
-    
-
-    if (!fname || !lname || !email || !password || !gender || !role) {
+    if (!fname || !lname || !email || !password || !role) {
       setValidationError(
         "Please fill all the fields for successfull registration"
       );
@@ -89,11 +86,6 @@ const  Signup = () => {
       return false;
     }
 
-    if (gender === "select") {
-      setValidationError("Please select Your Gender");
-      return false;
-    }
-
     // Validate password
     if (
       !/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%?&])[A-Za-z\d@$!%?&]{8,}$/.test(
@@ -119,20 +111,15 @@ const  Signup = () => {
 
     setLoading(true);
     try {
-      
+      const res = await axiosInstance.post("/auth/sendOtp", formData);
 
-      const res = await axiosInstance.post("/auth/sendOtp", formData)
+      const result = res.data;
 
-      const result = res.data
-      
-
-      localStorage.setItem("registrationForm", JSON.stringify(formData))
-      localStorage.setItem('otp', result.otp)
-      setLoading(false)
-      toast.success(result.message)
-      navigate('/otp')
-
-
+      localStorage.setItem("registrationForm", JSON.stringify(formData));
+      localStorage.setItem("otp", result.otp);
+      setLoading(false);
+      toast.success(result.message);
+      navigate("/otp");
     } catch (error) {
       toast.error(error.response.data.message);
       setLoading(false);
@@ -191,23 +178,6 @@ const  Signup = () => {
             />
           </div>
 
-          <div className="mb-5 flex items-center justify-between">
-            <label className="text-headingColor font-bold text-[16px] leading-7">
-              Gender:
-              <select
-                name="gender"
-                value={formData.gender}
-                onChange={handleInputChange}
-                className="text-textColor font-semibold text-[15px] leading-7 px-4 py-3 focus:outline-none rounded-lg"
-              >
-                <option value="select">Select</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-              </select>
-            </label>
-          </div>
-
           <div className="mb-5 relative">
             <input
               type={showPassword ? "text" : "password"}
@@ -252,7 +222,7 @@ const  Signup = () => {
             </div>
           </div>
 
-          <div className="mt-7">
+          <div className="mt-7 mb-5">
             <button
               disabled={loading && true}
               type="submit"
@@ -261,6 +231,43 @@ const  Signup = () => {
               {loading ? <HashLoader size={35} color="#ffffff" /> : "Sign up"}
             </button>
           </div>
+
+          <GoogleOAuthProvider clientId="665919114471-3kgrus9ohk8pqq07a5d0hovma3bt5244.apps.googleusercontent.com">
+            <GoogleLogin
+              onSuccess={(credentialResponse) => {
+                if (credentialResponse) {
+                  const decoded = jwtDecode(credentialResponse.credential);
+                  const data = {
+                    fname: decoded.given_name,
+                    lname: decoded.family_name,
+                    email: decoded.email,
+                    password: decoded.sub,
+                    role: formData.role,
+                  };
+
+                  const reg = async () => {
+                    try {
+                      const res = await axiosInstance.post(
+                        "/auth/register",
+                        data
+                      );
+                      const { message } = res.data;
+
+                      toast.success(message);
+                      navigate("/login");
+                    } catch (err) {
+                      toast.error(error.response.data.message);
+                    }
+                  };
+
+                  reg();
+                }
+              }}
+              onError={() => {
+                console.log("Registration Failed");
+              }}
+            />
+          </GoogleOAuthProvider>
 
           <p className="mt-5 text-textColor text-center">
             Are you a Specialist?
