@@ -1,7 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { formateDate } from "../../utils/formateDate";
 import axiosInstance from "../../axiosConfig"
 import { toast } from "react-toastify";
+import { authContext } from "../../context/AuthContext";
+import io from "socket.io-client"
+
+const socket = io("http://localhost:5000")
 
 const MyAppointments = ({ bookingData, refetch }) => {
   const [statusValues, setStatusValues] = useState({}); 
@@ -9,16 +13,30 @@ const MyAppointments = ({ bookingData, refetch }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
 
+  const { user, role, token, dispatch } = useContext(authContext);
+
+
   const toggleDropdown = (index) => {
     setShowDropdowns((prev) => ({ ...prev, [index]: !prev[index] }));
   };
 
-  const cancelBooking = async(id, specialistId, index) => {
+  const cancelBooking = async(id, userId, specialistId, index) => {
     setStatusValues((prev) => ({ ...prev, [index]: "Cancel" }));
     try {
       const res = await axiosInstance.patch(
         `booking/cancelBooking/${id}/${specialistId}`
       )
+      
+      const data ={
+        userId : userId,
+        message : `${user.fname} ${user.lname } cancelled your booking`
+      }
+
+      const notiResponse = await axiosInstance.post(
+        "/notification/create",
+        data
+      )
+
       const result = res.data
       toast.success(result.message)
     } catch (error) {
@@ -45,6 +63,8 @@ const MyAppointments = ({ bookingData, refetch }) => {
   const currentItems = bookingData.slice(indexOfFirstItem, indexOfLastItem);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  socket.emit("specialist-cancel")
 
   return (
     <div className="flex flex-col items-center">
@@ -133,7 +153,7 @@ const MyAppointments = ({ bookingData, refetch }) => {
                                     : "text-gray-500"
                                 } block px-4 py-2`}
                                 onClick={() => {
-                                  cancelBooking(data._id, data.specialist._id, index);
+                                  cancelBooking(data._id, data.user._id, data.specialist._id, index);
                                   toggleDropdown(index);
                                 }}
                               >

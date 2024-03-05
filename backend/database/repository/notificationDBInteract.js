@@ -13,9 +13,9 @@ export const createNotificationDB = async (data)=>{
     } catch (error) {
         console.log(error);
     }
-}
+} 
 
-export const getNotificationDataBySpecialistId = async (id)=>{
+export const getNotificationDataBySpecialistId = async (id)=>{ 
     try {
         const data = await Notification.aggregate([
             {
@@ -36,11 +36,41 @@ export const getNotificationDataBySpecialistId = async (id)=>{
     }
 }
 
+export const getNotificationDataByFarmerId = async (id)=>{
+    try {
+        const data = await Notification.aggregate([
+            {
+              $match: {
+                userId: id,
+                is_Seen: false
+              }
+            },
+            {
+              $sort: {
+                createdAt: -1
+              }
+            }
+          ]);
+        return data
+    } catch (error) {
+        console.log(error);
+    } 
+}
+
 export const updateSeenDB = async(id)=>{
     try {
         const data = await Notification.updateMany({specialistId:id},{$set:{is_Seen:true}})
         return data
     } catch (error) {
-        console.log(error);
+        console.log(error); 
     }
+}
+
+export const updateSeenDBUser = async (id)=>{
+    try {
+        const data = await Notification.updateMany({userId:id},{$set:{is_Seen:true}})
+        return data
+    } catch (error) {
+        console.log(error); 
+    } 
 }

@@ -6,8 +6,9 @@ import { createNotification, getNotificationData, updateSeen } from "../controll
 
 const router = express.Router()
 
-router.get('/getData/:id',getNotificationData)
+router.get('/getData/:id',getNotificationData) 
 router.post('/create', createNotification)
 router.patch('/updateSeen/:id', updateSeen)
 
 export default router 
+   

@@ -15,13 +15,9 @@ const SpecialistSignup = () => {
     lname: "",
     email: "",
     mobile: "",
-    qualification: "",
-    specialization: "",
-    certificate: "",
     password: "",
     photo: "",
     role: "specialist",
-    gender: "",
   });
 
   const navigate = useNavigate();
@@ -72,11 +68,11 @@ const SpecialistSignup = () => {
 
   const validateForm = () => {
     
-    const { fname, lname, email, password, mobile, gender, role, qualification, specialization } = formData;
+    const { fname, lname, email, password, mobile, role  } = formData;
 
    
 
-    if (!fname || !lname || !email || !password || !gender || !role || !qualification || !specialization) {
+    if (!fname || !lname || !email || !password || !role) {
       setValidationError(
         "Please fill all the fields for successfull registration"
       );
@@ -110,11 +106,6 @@ const SpecialistSignup = () => {
 
     if (!/^\d{10}$/.test(mobile)) {
       setValidationError("Phone number must be exactly 10 digits");
-      return false;
-    }
-
-    if (gender === "select") {
-      setValidationError("Please select Your Gender");
       return false;
     }
 
@@ -231,23 +222,6 @@ const SpecialistSignup = () => {
               className="w-full py-3 border-b border-solid border-[#0066ff61] focus:outline-none focus:border-b-primaryColor text-[16px] leading-7 text-headingColor placeholder:text-textColor cursor-pointer"
               
             />
-          </div>
-
-          <div className="mb-5 flex items-center justify-between">
-            <label className="text-headingColor font-bold text-[16px] leading-7">
-              Gender:
-              <select
-                name="gender"
-                value={formData.gender}
-                onChange={handleInputChange}
-                className="text-textColor font-semibold text-[15px] leading-7 px-4 py-3 focus:outline-none rounded-lg"
-              >
-                <option value="select">Select</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-              </select>
-            </label>
           </div>
 
           <div className="mb-5 flex items-center justify-between">

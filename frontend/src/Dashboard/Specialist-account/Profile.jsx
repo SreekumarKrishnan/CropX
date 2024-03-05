@@ -17,7 +17,7 @@ const Profile = ({ user }) => {
     role: "farmer",
     specialization: "",
     qualification: "",
-    gender: "",
+    certificate:"",
     fee:null
     
   });
@@ -31,7 +31,7 @@ const Profile = ({ user }) => {
       photo: user.photo,
       specialization: user.specialization,
       qualification: user.qualification,
-      gender: user.gender,
+      certificate:user.certificate,
       fee : user.fee
       
     });
@@ -40,6 +40,9 @@ const Profile = ({ user }) => {
   const navigate = useNavigate();
 
   const [selectedFile, setSelectedFile] = useState(null);
+  const [previewURL, setPreviewURL] = useState("");
+  const [certificateImagePreviewURL, setCertificateImagePreviewURL] = useState(null);
+  const [certificateSelectedFile, setCertificateSelectedFile] = useState("");
 
   const [loading, setLoading] = useState(false);
 
@@ -61,6 +64,15 @@ const Profile = ({ user }) => {
     setPreviewURL(data.url);
     setSelectedFile(data.url);
     setFormData({ ...formData, photo: data.url });
+  };
+
+  const handleCertificateFileInputChange = async (e) => {
+    const file = e.target.files[0];
+    const data = await uploadImageToCloudinary(file);
+    console.log(data);
+    setCertificateImagePreviewURL(data.url);
+    setCertificateSelectedFile(data.url);
+    setFormData({ ...formData, certificate: data.url });
   };
 
   const toggleShowPassword = () => {
@@ -182,22 +194,30 @@ const Profile = ({ user }) => {
           />
         </div>
 
-        <div className="mb-5 flex items-center justify-between">
-          <label className="text-headingColor font-bold text-[16px] leading-7">
-            Gender:
-            <select
-              name="gender"
-              value={formData.gender}
-              onChange={handleInputChange}
-              className="text-textColor font-semibold text-[15px] leading-7 px-4 py-3 focus:outline-none rounded-lg"
-            >
-              <option value="select">Select</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
-            </select>
-          </label>
-        </div>
+        <div className="mb-5 flex items-center gap-3">
+            {formData.certificate && (
+              <figure className="w-[60px] h-[60px] border-2 border-solid border-primaryColor flex items-center justify-center">
+                <img src={formData.certificate} alt="" className="w-full object-cover" />
+              </figure>
+            )}
+            <div className="relative w-[130px] h-[50px]">
+              <input
+                type="file"
+                name="photo"
+                id="customFile1"
+                onChange={handleCertificateFileInputChange}
+                accept=".jpg, .png"
+                className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer "
+              />
+              <label
+                htmlFor="customFile1"
+                className="absolute top-0 left-0 w-[150px] h-full flex items-center px-[0.75rem] py-[0.375rem] text-[15px] leading-6 overflow-hidden bg-[#0066ff46] text-headingColor font-semibold rounded-lg truncate cursor-pointer "
+              >
+                Upload Certificate
+              </label>
+            </div>
+          </div>
+
 
         <div className="mb-5 flex items-center gap-3">
           {formData.photo && (

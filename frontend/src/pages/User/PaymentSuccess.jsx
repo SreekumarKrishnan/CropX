@@ -28,7 +28,6 @@ const PaymentSuccess = () => {
       );
 
       const data ={
-        userId : bookingData.userId,
         specialistId : bookingData.specialistId,
         message : `${user.fname} ${user.lname } booked`
       }

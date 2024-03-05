@@ -1,20 +1,38 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { formateDate } from "../../utils/formateDate";
 import axiosInstance from "../../axiosConfig"
 import { toast } from "react-toastify";
+import io from "socket.io-client"
+import { authContext } from "../../context/AuthContext";
+
+const socket = io("http://localhost:5000")
 
 
 const MyBookings = ({ bookingData, refetch }) => {
 
+  const { user, role, token, dispatch } = useContext(authContext);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
 
-  const cancelBooking = async(id, userId) => {
+  const cancelBooking = async(id, userId, specialistId) => {
     
     try {
       const res = await axiosInstance.patch(
         `booking/cancelBooking/${id}/${userId}`
       )
+
+      const data ={
+        specialistId : specialistId,
+        message : `${user.fname} ${user.lname } cancelled appointment`
+      }
+
+      const notiResponse = await axiosInstance.post(
+        "/notification/create",
+        data
+      )
+
+
       const result = res.data
       toast.success(result.message)
     } catch (error) {
@@ -28,6 +46,8 @@ const MyBookings = ({ bookingData, refetch }) => {
   const currentItems = bookingData.slice(indexOfFirstItem, indexOfLastItem);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  socket.emit("user-cancel")
 
   return (
     <div className="flex flex-col items-center">
@@ -102,7 +122,7 @@ const MyBookings = ({ bookingData, refetch }) => {
                       
                       <td className="px-6 py-4">
                         <button
-                          onClick={() => cancelBooking(data._id, data.user._id, index)}
+                          onClick={() => cancelBooking(data._id, data.user._id, data.specialist._id, index)}
                           className="px-4 py-2 font-semibold text-white bg-red-500 border border-yellow-500 rounded hover:bg-yellow-500 hover:text-white hover:border-transparent"
                         >
                           Cancel

@@ -61,6 +61,14 @@ io.on("connection", (socket) => {
   socket.on("new-booking",(result)=>{
     io.emit("notify-specialist",{message:result})
   })
+
+  socket.on("specialist-cancel",()=>{
+    io.emit("notify-specialist-cancel")
+  })
+
+  socket.on("user-cancel",()=>{
+    io.emit("notify-user-cancel")
+  })
  
 });
 

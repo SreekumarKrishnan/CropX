@@ -6,7 +6,6 @@ const SpecialistSchema = new mongoose.Schema({
   lname: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   mobile: { type: Number },
-  gender : { type: String, enum: ["select", "male", "female", "other"] },
   qualification: { type: String},
   specialization : {
     type : mongoose.Schema.Types.ObjectId,

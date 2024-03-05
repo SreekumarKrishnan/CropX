@@ -9,7 +9,6 @@ import { MdNotificationsActive } from "react-icons/md";
 import io from "socket.io-client";
 import axiosInstance from "../../axiosConfig";
 
-
 const socket = io("http://localhost:5000");
 
 const icon = <HiMiniChatBubbleLeftRight />;
@@ -66,9 +65,8 @@ const Header = () => {
 
   const toggleNotification = () => {
     setNotificationOpen(!isNotificationOpen);
-   
-    if (isNotificationOpen === true && role === "specialist") {
-      
+
+    if (isNotificationOpen === true) {
       handleSpecialistNotification();
     }
   };
@@ -76,12 +74,13 @@ const Header = () => {
   const handleLogout = () => {
     dispatch({ type: "LOGOUT" });
     location.reload();
-  };
+  }; 
 
   useEffect(() => {
+    
     const fetchData = async () => {
       const response = await axiosInstance.get(
-        `notification/getData/${user._id}`
+        `notification/getData/${user._id}`,
       );
 
       setNotifications(response.data.data);
@@ -95,9 +94,13 @@ const Header = () => {
       //setBookingState(true);
       //setNotificationCount(notifications.length)
     });
+    socket.on("notify-specialist-cancel")
+    socket.on("notify-user-cancel")
 
     return () => {
       socket.off("notify-specialist");
+      socket.off("notify-specialist-cancel")
+      socket.off("notify-user-cancel")
     };
   }, []);
 
@@ -183,7 +186,7 @@ const Header = () => {
                       </li>
                     </ul>
                   </div>
-                )}
+                )}    
 
                 <div onClick={toggleDropdown}>
                   <Link>
@@ -220,7 +223,7 @@ const Header = () => {
                       aria-label="Notification"
                       style={{ fontSize: "1.5rem" }}
                     >
-                      {role == "farmer" && (
+                      {notifications.length > 0 && role == "farmer" && (
                         <span
                           className="bg-red-500 text-white rounded-full px-2 ml-1"
                           style={{
@@ -230,12 +233,13 @@ const Header = () => {
                             fontSize: "0.7rem",
                           }}
                         >
-                          {}
+                          {notifications.length}
                         </span>
                       )}
+
                       {notification}
                     </span>
-                    {/* Display notification count */}
+
                     {notifications.length > 0 && role == "specialist" && (
                       <span
                         className="bg-red-500 text-white rounded-full px-2 ml-1"
@@ -270,6 +274,28 @@ const Header = () => {
                       )}
                     </>
                   )}
+
+                  {isNotificationOpen && role === "farmer" && (
+                    <>
+                      {notifications.length > 0 ? (
+                        <div className="absolute right-0 mt-2 bg-white border border-gray-300 rounded shadow-md w-48">
+                          {/* Add your notification content here */}
+                          <ul>
+                            {notifications.map((msg) => (
+                              <li key={msg.id}>{msg.message}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ) : (
+                        <div className="absolute right-0 mt-2 bg-white border border-gray-300 rounded shadow-md w-48">
+                          <ul>
+                            <li>No notifications</li>
+                          </ul>
+                        </div>
+                      )}
+                    </>
+                  )}
+
                 </div>
               </div>
             ) : (

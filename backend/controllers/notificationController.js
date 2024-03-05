@@ -1,4 +1,6 @@
-import { createNotificationDB, getNotificationDataBySpecialistId, updateSeenDB } from "../database/repository/notificationDBInteract.js";
+import { createNotificationDB, getNotificationDataByFarmerId, getNotificationDataBySpecialistId, updateSeenDB, updateSeenDBUser } from "../database/repository/notificationDBInteract.js";
+import { findSpecialistById } from "../database/repository/specialistDBInteract.js";
+import { findUser } from "../database/repository/userDBInteact.js";
 
 export const createNotification = async(req,res)=>{
     
@@ -14,29 +16,56 @@ export const createNotification = async(req,res)=>{
     }
 }
 export const getNotificationData = async(req,res)=>{
-    const id = req.params.id
+    const id = req.params.id 
+
     try {
-        const result = await getNotificationDataBySpecialistId(id)
+        let user
+        user = await findUser(id)
+        if(!user){
+            user = await findSpecialistById(id)
+        }
+        let result
+        if(user.role==="specialist"){
+            result = await getNotificationDataBySpecialistId(id)
+        }
+        if(user.role==="farmer"){
+            result = await getNotificationDataByFarmerId(id)
+        } 
+
+        
         res.status(200).json({
             success: true,
             message: "got notification data successfully",
             data: result,
         });
     } catch (error) {
-        res.status(500).json({success: false, message: "getting notification data failed"})
+        res.status(500).json({success: false, message: "getting notification data failed"})    
     }
-}
-
+}          
+ 
 export const updateSeen = async (req,res)=>{
     const id = req.params.id
     try {
-        const result = await updateSeenDB(id)
+        let user
+        user = await findUser(id)
+        if(!user){
+            user = await findSpecialistById(id)
+        }
+        let result
+        
+        if(user.role==="specialist"){
+            result = await updateSeenDB(id)
+        }
+        if(user.role==="farmer"){
+            result = await updateSeenDBUser(id)
+        } 
+        
         res.status(200).json({
             success: true,
             message: "update seen notification data successfully",
             data: result,
-        });
+        }); 
     } catch (error) {
         res.status(500).json({success: false, message: "Seen updation failed"})  
     }
-}
+}   
