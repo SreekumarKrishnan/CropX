@@ -10,7 +10,6 @@ const SpecialistSchema = new mongoose.Schema({
   specialization : {
     type : mongoose.Schema.Types.ObjectId,
     ref : "Specialization",
-    required : true
   },
   certificate : { type: String },
   password: { type: String, required: true },

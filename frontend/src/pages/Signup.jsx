@@ -255,7 +255,7 @@ const Signup = () => {
 
                       toast.success(message);
                       navigate("/login");
-                    } catch (err) {
+                    } catch (error) {
                       toast.error(error.response.data.message);
                     }
                   };

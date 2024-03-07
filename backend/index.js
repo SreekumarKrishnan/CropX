@@ -42,7 +42,6 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     activeUsers = activeUsers.filter((user) => user.socketId !== socket.id);
-    console.log("User Disconnected", activeUsers);
     io.emit("get-users", activeUsers);
   });
 
@@ -89,7 +88,7 @@ app.use('/api/v1/chat', chatRoute)
 app.use('/api/v1/message', messageRoute)
 app.use('/api/v1/booking', bookingRoute ) 
 app.use('/api/v1/wallet', walletRoute )
-app.use('/api/v1/notification', notificationRoute)
+app.use('/api/v1/notification', notificationRoute) 
 
 const port = process.env.PORT
 

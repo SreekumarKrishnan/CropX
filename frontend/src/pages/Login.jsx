@@ -8,7 +8,13 @@ import axiosInstance from "../axiosConfig";
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 
+
+
+
 const Login = () => {
+
+  
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -130,7 +136,7 @@ const Login = () => {
             </button>
           </div>
 
-          <GoogleOAuthProvider clientId="665919114471-3kgrus9ohk8pqq07a5d0hovma3bt5244.apps.googleusercontent.com">
+          <GoogleOAuthProvider clientId={import.meta.env.VITE_REACT_APP_GOOGLE_CLIENT_ID}>
             <GoogleLogin
               onSuccess={(credentialResponse) => {
                 if (credentialResponse) {

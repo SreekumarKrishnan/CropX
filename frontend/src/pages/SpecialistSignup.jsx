@@ -8,6 +8,8 @@ import { toast } from "react-toastify";
 import HashLoader from "react-spinners/HashLoader";
 import axiosInstance from "../axiosConfig"
 import useGetAllSpecializations from "../hooks/UseFetchAllSpecializationData"
+import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
 
 const SpecialistSignup = () => {
   const [formData, setFormData] = useState({
@@ -106,19 +108,6 @@ const SpecialistSignup = () => {
 
     if (!/^\d{10}$/.test(mobile)) {
       setValidationError("Phone number must be exactly 10 digits");
-      return false;
-    }
-
-    if (specialization === "select") {
-      setValidationError("Please select Your Specialization");
-      return false;
-    }
-
-    if (!/^[a-zA-Z\s]{1,25}$/.test(qualification)) {
-      setValidationError(
-        "Please enter your Exact Qualification"
-      );
-
       return false;
     }
 
@@ -224,60 +213,6 @@ const SpecialistSignup = () => {
             />
           </div>
 
-          <div className="mb-5 flex items-center justify-between">
-            <label className="text-headingColor font-bold text-[16px] leading-7">
-              Specialization:
-              <select
-                name="specialization"
-                value={formData.specialization}
-                onChange={handleInputChange}
-                className="text-textColor font-semibold text-[15px] leading-7 px-4 py-3 focus:outline-none rounded-lg"
-              >
-                <option value="select">Select</option>
-                {specializationData.map((item)=>(
-                  <option value={item._id} key={item._id}>{item.name}</option>
-                ))}
-                
-              </select>
-            </label>
-          </div>
-
-          <div className="mb-5">
-            <input
-              type="text"
-              placeholder="Qualification"
-              name="qualification"
-              value={formData.qualification}
-              onChange={handleInputChange}
-              className="w-full py-3 border-b border-solid border-[#0066ff61] focus:outline-none focus:border-b-primaryColor text-[16px] leading-7 text-headingColor placeholder:text-textColor cursor-pointer"
-              
-            />
-          </div>
-
-          <div className="mb-5 flex items-center gap-3">
-            {certificateSelectedFile && (
-              <figure className="w-[60px] h-[60px] border-2 border-solid border-primaryColor flex items-center justify-center">
-                <img src={certificateImagePreviewURL} alt="" className="w-full object-cover" />
-              </figure>
-            )}
-            <div className="relative w-[130px] h-[50px]">
-              <input
-                type="file"
-                name="photo"
-                id="customFile1"
-                onChange={handleCertificateFileInputChange}
-                accept=".jpg, .png"
-                className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer "
-              />
-              <label
-                htmlFor="customFile1"
-                className="absolute top-0 left-0 w-[150px] h-full flex items-center px-[0.75rem] py-[0.375rem] text-[15px] leading-6 overflow-hidden bg-[#0066ff46] text-headingColor font-semibold rounded-lg truncate cursor-pointer "
-              >
-                Upload Certificate
-              </label>
-            </div>
-          </div>
-
           <div className="mb-5 relative">
             <input
               type={showPassword ? "text" : "password"}
@@ -323,7 +258,7 @@ const SpecialistSignup = () => {
             </div>
           </div>
 
-          <div className="mt-7">
+          <div className="mt-7 mb-5">
             <button
               disabled={loading && true}
               type="submit"
@@ -332,6 +267,44 @@ const SpecialistSignup = () => {
               {loading ? <HashLoader size={35} color="#ffffff" /> : "Sign up"}
             </button>
           </div>
+
+          <GoogleOAuthProvider clientId="665919114471-3kgrus9ohk8pqq07a5d0hovma3bt5244.apps.googleusercontent.com">
+            <GoogleLogin
+              onSuccess={(credentialResponse) => {
+                if (credentialResponse) {
+                  const decoded = jwtDecode(credentialResponse.credential);
+                  const data = {
+                    fname: decoded.given_name,
+                    lname: decoded.family_name,
+                    email: decoded.email,
+                    password: decoded.sub,
+                    role: formData.role,
+                  };
+
+                  const reg = async () => {
+                    try {
+                      const res = await axiosInstance.post(
+                        "/auth/register",
+                        data
+                      );
+                      const { message } = res.data;
+
+                      toast.success(message);
+                      navigate("/login");
+                    } catch (error) {
+                      toast.error(error.response.data.message);
+                    }
+                  };
+
+                  reg();
+                }
+              }}
+              onError={() => {
+                console.log("Registration Failed");
+              }}
+            />
+          </GoogleOAuthProvider>
+
           {validationError && <p className="text-red-500">{validationError}</p>}
         </form>
       </div>

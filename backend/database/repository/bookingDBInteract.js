@@ -83,3 +83,13 @@ export const bookingsPerSpecialization = async()=>{
         console.log(error);
     }
 }
+
+export const bookingsPerId = async(id)=>{
+    
+    try {
+        const bookingData = await Booking.aggregate([{$match:{"specialist._id":new ObjectId(id)}}]).sort({createdAt:-1}) 
+        return bookingData
+    } catch (error) {
+        console.log(error);
+    }
+}

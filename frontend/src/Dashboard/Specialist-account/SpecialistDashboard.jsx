@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import altDp from "../../assets/images/altDp.png";
 import MyAppointments from "./MyAppointments";
 import Profile from "./Profile";
@@ -6,11 +6,14 @@ import useGetProfile from "../../hooks/UseFetchAllSpecialistData"
 import AddExperience from "./AddExperience";
 import AddSlot from "./AddSlot"
 import UseFetchBookingData from "../../hooks/UseFetchBookingData";
+import { authContext } from "../../context/AuthContext";
 
 const SpecialistDashboard = () => {
+  const { user, role, token, dispatch } = useContext(authContext);
   const [tab, setTab] = useState("appointments");
   const { specialistData : userData, refetch: userRefetch } = useGetProfile("/specialist/profile")
-  const { bookingData : bookingData, refetch : refetch } = UseFetchBookingData("/admin/getAllBookingData")
+  const { bookingData : bookingData, refetch : refetch } = UseFetchBookingData(`/booking/getDataPerId/${user._id}`)
+  
   return (
     <section>
       <div className="max-w-[1170px] px-5 mx-auto">

@@ -1,4 +1,4 @@
-import {bookingPerAppointmentDate, bookingsPerSpecialization, findBookingDataByBookingId, findBookingIdAndUpdate, getBookingsCount, totalBookingRevenue} from "../database/repository/bookingDBInteract.js"
+import {bookingPerAppointmentDate, bookingsPerId, bookingsPerSpecialization, findBookingDataByBookingId, findBookingIdAndUpdate, getBookingsCount, totalBookingRevenue} from "../database/repository/bookingDBInteract.js"
 import { findSpecialistById, updateSpecialistById } from "../database/repository/specialistDBInteract.js";
 import { findUser } from "../database/repository/userDBInteact.js";
 import { findWalletById, refundTowallet } from "../database/repository/walletDBInteract.js";
@@ -120,4 +120,21 @@ export const getTotalBookingsPerSpecialization = async (req,res)=>{
         .status(500)
         .json({ success: false, message: "fetch all bookings bookings per failed" });
     }
+}
+
+export const getBookingPerId = async (req,res)=>{
+  const id = req.params.id
+  
+  try {
+      const data = await bookingsPerId(id)
+      res.status(200).json({
+          success: true,
+          message: "got all bookings per Id",
+          data: data,
+      });
+  } catch (error) {
+      res
+      .status(500)
+      .json({ success: false, message: "fetch all bookings bookings per Id failed" });
+  }
 }
