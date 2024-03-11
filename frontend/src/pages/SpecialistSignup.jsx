@@ -268,7 +268,7 @@ const SpecialistSignup = () => {
             </button>
           </div>
 
-          <GoogleOAuthProvider clientId="665919114471-3kgrus9ohk8pqq07a5d0hovma3bt5244.apps.googleusercontent.com">
+          <GoogleOAuthProvider clientId={import.meta.env.VITE_REACT_APP_GOOGLE_CLIENT_ID}>
             <GoogleLogin
               onSuccess={(credentialResponse) => {
                 if (credentialResponse) {

@@ -2,59 +2,63 @@ import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { BASE_URL } from "../../config";
-import { toast } from 'react-toastify'
-
+import { toast } from "react-toastify";
+import axiosInstance from "../../axiosConfig";
+import { authContext } from "../../context/AuthContext";
 
 const AdminLogin = () => {
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
 
-    const [formData, setFormData] = useState({
-        email: "",
-        password: "",
-      });
-    
-      const navigate = useNavigate()
-    
-      const [showPassword, setShowPassword] = useState(false);
-    
-      const handleInputChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-      };
-    
-      const toggleShowPassword = () => {
-        setShowPassword(!showPassword);
-      };
-    
-      const [loading, setLoading] = useState(false)
-    
+  const navigate = useNavigate();
+
+  const { token, dispatch } = useContext(authContext);
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const [loading, setLoading] = useState(false);
+
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await axiosInstance.post(
+        "/auth/adminLogin",
+        formData
+      );
+
+
+      const result = res.data;
+
       
-    
-      const submitHandler = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        try {
-          const res = await fetch(`${BASE_URL}/auth/adminLogin `, {
-            method: "post",
-            headers: {
-              "Content-type": "application/json",
-            },
-            body: JSON.stringify(formData),
-          });
-    
-          const {message} = await res.json();
-          
-          if (!res.ok) {
-            throw new Error(message);
-          }
-          
-    
-          setLoading(false);
-          toast.success(message);
-          navigate("/admin/dashboard");
-        } catch (error) {
-          toast.error(error.message);
-          setLoading(false);
-        }
-      };
+
+      dispatch({
+        type: "LOGIN_SUCCESS",
+        payload: {
+          user: result,
+          role: result.role,
+          token: result.token,
+        },
+      });
+      
+      setLoading(false);
+      toast.success(result.message);
+      navigate("/admin/dashboard");
+    } catch (error) {
+      toast.error(error.response.message);
+      setLoading(false);
+    }
+  };
 
   return (
     <section className="px-5 lg:px-0">
@@ -97,17 +101,17 @@ const AdminLogin = () => {
           </div>
 
           <div className="mt-7">
-            <button type="submit" className="w-full bg-primaryColor text-white text-[18px] leading-[30px] rounded-lg">
+            <button
+              type="submit"
+              className="w-full bg-primaryColor text-white text-[18px] leading-[30px] rounded-lg"
+            >
               Log in
             </button>
           </div>
-
-          
-
         </form>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default AdminLogin
+export default AdminLogin;

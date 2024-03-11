@@ -19,7 +19,9 @@ const AdminDashboard = () => {
   const { specializationData: specializationData,refetch:specializationRefetch } = useGetAllSpecializations('/admin/allSpecialization')
   const { data : bookingData , refetch : bookingRefetch } = useFetchData("/admin/getAllBookingData")
   
-  
+  const handleLogout = ()=>{
+    console.log("logout clicked");
+  }
 
   return (
     <div className="container mx-auto p-6">
@@ -73,6 +75,13 @@ const AdminDashboard = () => {
             } px-4 py-2 rounded-md text-lg font-semibold border border-solid border-gray-500 focus:outline-none flex items-center`}
           >
             Booking Status
+          </button>
+
+          <button
+            onClick={handleLogout}
+            className={`bg-red-500 px-4 py-2 rounded-md text-lg font-semibold border border-solid border-gray-500 focus:outline-none flex items-center`}
+          >
+            Log out
           </button>
 
         </div>

@@ -18,6 +18,8 @@ import SpecialistDetails from '../pages/Specialists/SpecialistDetails'
 import PaymentSuccess from '../pages/User/PaymentSuccess'
 import PaymentFailed from '../pages/User/PaymentFailed'
 import Chat from '../pages/ChatComponents/Chat/Chat'
+import Unauthorized from '../ErrorPages/Unauthorized'
+import PageNotFound from '../ErrorPages/PageNotFound'
 
 
 const Routers = () => {
@@ -27,7 +29,6 @@ const Routers = () => {
       <Route path='/' element={<Home/>} />
       <Route path='/home' element={<Home/>} />
       <Route path='/login' element={<Login/>} />
-      
       <Route path='/otp' element={<Otp/>} />
       <Route path='/signup' element={<Signup/>} />
       <Route path='/specialist/signup' element={<SpecialistSignup/>} />
@@ -35,13 +36,15 @@ const Routers = () => {
       <Route path='/contact' element={<Contact/>} />
       <Route path='/specialists' element={<Specialists/>} />
       <Route path='/admin/login' element={<AdminLogin/>} />
-      <Route path='/admin/dashboard' element={<AdminDashboard/>} />
+      <Route path='/admin/dashboard' element={<ProtectedRoute allowedRoles={["admin"]}><AdminDashboard/></ProtectedRoute>} />
       <Route path='/user/profile' element={<ProtectedRoute allowedRoles={["farmer"]}><MyAccount/></ProtectedRoute>} />
       <Route path='/specialist/profile' element={<ProtectedRoute allowedRoles={["specialist"]}><SpecialistDashboard/></ProtectedRoute>} />
       <Route path='/specialist/:id' element={<ProtectedRoute allowedRoles={["farmer"]}><SpecialistDetails/></ProtectedRoute>} />
       <Route path='/user/paymentSuccess' element={<ProtectedRoute allowedRoles={["farmer"]}><PaymentSuccess/></ProtectedRoute>} />
       <Route path='/user/paymentFailed' element={<PaymentFailed/>} />
       <Route path='/chat' element={<Chat/>} />
+      <Route path='/unauthorized' element={<Unauthorized />} />
+      <Route path='*' element={<PageNotFound />} />
       
     </Routes>
   
