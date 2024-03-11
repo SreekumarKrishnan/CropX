@@ -1,22 +1,24 @@
-import { findUserByEmail, createUser } from "../database/repository/userDBInteact.js";
+import {
+  findUserByEmail,
+  createUser,
+} from "../database/repository/userDBInteact.js";
 import {
   findSpecialist,
   createSpecialist,
 } from "../database/repository/specialistDBInteract.js";
 import { findAdmin } from "../database/repository/adminDBInteract.js";
 import { passwordMatch } from "../services/bcryptService.js";
-import { generateToken } from "../services/jwtService.js";
+import { generateAdminToken, generateToken } from "../services/jwtService.js";
 import { generateOTP, sendOTPEmail } from "../services/mailSender.js";
 
 export const register = async (req, res) => {
-  
   try {
     const { email, role } = req.body;
 
     const userData = req.body;
 
     let user = null;
-    const findData = {email:email}
+    const findData = { email: email };
 
     if (role === "farmer") {
       user = await findUserByEmail(findData);
@@ -25,7 +27,9 @@ export const register = async (req, res) => {
     }
 
     if (user) {
-      return res.status(400).json({ message: "User already exist in same email" });
+      return res
+        .status(400)
+        .json({ message: "User already exist in same email" });
     }
 
     if (role === "farmer") {
@@ -50,11 +54,9 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    
-
     let user = null;
 
-    const findData = {email:email}
+    const findData = { email: email };
 
     const farmer = await findUserByEmail(findData);
 
@@ -66,14 +68,13 @@ export const login = async (req, res) => {
     if (specialist) {
       user = specialist;
     }
-    
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-     
-    if(user.is_Blocked){
-      
-      return res.status(401).json({message: "You are Blocked"})
+
+    if (user.is_Blocked) {
+      return res.status(401).json({ message: "You are Blocked" });
     }
 
     const isPasswordMatch = await passwordMatch(password, user.password);
@@ -84,7 +85,7 @@ export const login = async (req, res) => {
         .json({ status: false, message: "Invalid credentials" });
     }
 
-    const token = await generateToken(user); 
+    const token = await generateToken(user);
 
     res.status(200).json({
       data: {
@@ -99,10 +100,10 @@ export const login = async (req, res) => {
         photo: user.photo,
         role: user.role,
         gender: user.gender,
-        qualification: user.qualification, 
-        certificate : user.certificate, 
+        qualification: user.qualification,
+        certificate: user.certificate,
         is_blocked: user.is_Blocked,
-        is_Approved : user.is_Approved
+        is_Approved: user.is_Approved,
       },
     });
   } catch (error) {
@@ -110,37 +111,50 @@ export const login = async (req, res) => {
   }
 };
 
-export const adminLogin = async(req,res)=>{
+export const adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    
 
     let user = null;
 
     user = await findAdmin(email);
-   
+
+    
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.status(200).json({message:"Admin login successful"});
+    if (password !== user.password) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    
+
+    const token = await generateAdminToken(user);
+
+
+    res
+      .status(200)
+      .json({
+        message: "Admin login successful",
+        token,
+        _id: user._id,
+        email: user.email,
+        role: user.role,
+      });
   } catch (error) {
     res.status(500).json({ success: false, message: "Failed to Login" });
   }
-}
+};
 
-export const sendOtp = async(req,res)=>{
+export const sendOtp = async (req, res) => {
   try {
-    const {email} = req.body
-    const otp = generateOTP()
-    sendOTPEmail(email,otp)
-    res.status(200).json({message:"Otp sent successfully",otp:otp});
-
-
+    const { email } = req.body;
+    const otp = generateOTP();
+    sendOTPEmail(email, otp);
+    res.status(200).json({ message: "Otp sent successfully", otp: otp });
   } catch (error) {
     res.status(500).json({ success: false, message: "Failed to sent otp" });
-  } 
-}
- 
+  }
+};
