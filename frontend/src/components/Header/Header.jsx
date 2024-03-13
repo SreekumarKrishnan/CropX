@@ -9,7 +9,7 @@ import { MdNotificationsActive } from "react-icons/md";
 import io from "socket.io-client";
 import axiosInstance from "../../axiosConfig";
 
-const socket = io("http://localhost:5000");
+const socket = io("https://cropx.sreekumarkrishnan.live");
 
 const icon = <HiMiniChatBubbleLeftRight />;
 const notification = <MdNotificationsActive />;

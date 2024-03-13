@@ -151,8 +151,8 @@ export const makePayment = async (req, res) => {
         },
       ],
       mode: "payment",
-      success_url: "http://localhost:5173/user/paymentSuccess",
-      cancel_url: "http://localhost:5173/user/paymentFailed",
+      success_url: "https://cropx.sreekumarkrishnan.live/user/paymentSuccess",
+      cancel_url: "https://cropx.sreekumarkrishnan.live/user/paymentFailed",
     });
 
     // If the currency is INR, restrict shipping to India

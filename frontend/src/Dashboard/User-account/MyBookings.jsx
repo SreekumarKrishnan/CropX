@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import io from "socket.io-client"
 import { authContext } from "../../context/AuthContext";
 
-const socket = io("http://localhost:5000")
+const socket = io("https://cropx.sreekumarkrishnan.live")
 
 
 const MyBookings = ({ bookingData, refetch }) => {
