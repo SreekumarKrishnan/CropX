@@ -16,7 +16,12 @@ const Chat = () => {
   const [currentChat, setCurrentChat] = useState(null);
   const [sendMessage, setSendMessage] = useState(null);
   const [receivedMessage, setReceivedMessage] = useState(null);
+  
   const socket = useRef();
+
+  
+
+  
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -37,6 +42,7 @@ const Chat = () => {
           const response = await axiosInstance.get(`/chat/${userId}`)
           
           const data = response.data?.data
+          
           const sortedChats = data
             .map((chat) => ({ ...chat, updatedAt: new Date(chat.updatedAt) }))
             .sort((a, b) => b.updatedAt - a.updatedAt);
@@ -96,6 +102,9 @@ const Chat = () => {
     return false; 
   };
 
+ 
+
+
   return (
     <div className="grid grid-cols-1  sm:grid-cols-5 mr-2 gap-2">
       <div className="sm:col-span-1  m-4">
@@ -115,6 +124,7 @@ const Chat = () => {
                     data={chat}
                     currentUser={userInfo?._id || specialistInfo?._id}
                     online={checkOnlineStatus(chat)}
+                   
                   />
                 </div>
               ))}
@@ -130,6 +140,7 @@ const Chat = () => {
           currentUser={userInfo?._id || specialistInfo?._id}
           setSendMessage={setSendMessage}
           receivedMessage={receivedMessage}
+         
         />
       </div>
     </div>

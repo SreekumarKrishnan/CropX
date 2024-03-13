@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import UserManagment from '../Admin/UserManagement.jsx';
 import SpecialistManagment from '../Admin/SpecialistManagement.jsx';
 import SpecializationManagement from '../Admin/SpecializationManagement.jsx';
@@ -9,6 +9,8 @@ import useGetAllSpecialists from '../../hooks/UseFetchAllSpecialistData.jsx';
 import useGetAllSpecializations from '../../hooks/UseFetchAllSpecializationData.jsx'
 import BookingStatus from './BookingStatus.jsx';
 import useFetchData from '../../hooks/UseFetchData.jsx';
+import { authContext } from '../../context/AuthContext.jsx';
+import { useNavigate } from 'react-router-dom';
 
 
 const AdminDashboard = () => {
@@ -18,9 +20,13 @@ const AdminDashboard = () => {
   const { specialistData: specialistsData,refetch:specialistRefetch } = useGetAllSpecialists('/admin/allSpecialists');
   const { specializationData: specializationData,refetch:specializationRefetch } = useGetAllSpecializations('/admin/allSpecialization')
   const { data : bookingData , refetch : bookingRefetch } = useFetchData("/admin/getAllBookingData")
+
+  const { dispatch } = useContext(authContext)
+  const navigate = useNavigate()
   
   const handleLogout = ()=>{
-    console.log("logout clicked");
+    dispatch({ type: "LOGOUT" });
+    navigate("/admin/login")
   }
 
   return (

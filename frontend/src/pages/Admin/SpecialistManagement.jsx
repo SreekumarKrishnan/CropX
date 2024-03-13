@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { BASE_URL } from "../../config";
 import axiosInstance from "../../axiosConfig";
 import CertificateModal from "./CertificateModal";
 
@@ -7,6 +6,8 @@ const SpecialistManagement = ({ specialists, specialistRefetch }) => {
   const [selectedCertificate, setSelectedCertificate] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterCriteria, setFilterCriteria] = useState("");
 
   const handleCertificateClick = (certificate) => {
     setSelectedCertificate(certificate);
@@ -36,9 +37,39 @@ const SpecialistManagement = ({ specialists, specialistRefetch }) => {
     specialistRefetch();
   };
 
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value);
+    setCurrentPage(1); // Reset pagination when searching
+  };
+
+  const handleFilter = (event) => {
+    setFilterCriteria(event.target.value);
+    setCurrentPage(1); // Reset pagination when applying filter
+  };
+
+  const filteredSpecialists = specialists.filter((specialist) => {
+    // Apply search criteria
+    const searchMatch =
+      specialist.fname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      specialist.lname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      specialist.email.toLowerCase().includes(searchTerm.toLowerCase());
+
+    // Apply filter criteria
+    const filterMatch =
+      filterCriteria === "" ||
+      (specialist.specialization &&
+        specialist.specialization.name.toLowerCase() ===
+          filterCriteria.toLowerCase());
+
+    return searchMatch && filterMatch;
+  });
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = specialists.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredSpecialists.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
@@ -47,7 +78,40 @@ const SpecialistManagement = ({ specialists, specialistRefetch }) => {
       {/* Navbar Component */}
       {/* Assuming there's a component named Navbar */}
 
-      <div className="col-span-3 ">
+      {/* Search and Filter */}
+      <div className="flex justify-between mt-4 mb-2 ml-auto">
+        <div className="w-1/3">
+          <label className="block text-gray-700 text-sm font-bold mb-2">
+            Search:
+          </label>
+          <input
+            type="text"
+            className="w-full p-2 border rounded"
+            value={searchTerm}
+            onChange={handleSearch}
+          />
+        </div>
+        <div className="w-1/3">
+          <label className="block text-gray-700 text-sm font-bold mb-2">
+            Filter by Specialization:
+          </label>
+          <select
+            className="w-full p-2 border rounded"
+            value={filterCriteria}
+            onChange={handleFilter}
+          >
+            <option value="">All</option>
+            {specialists.map((specialist) => (
+              <option key={specialist._id} value={specialist.specialization.name}>
+                {specialist.specialization.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="col-span-3">
         <section className="container">
           <div className="relative mx-5 overflow-x-auto shadow-md sm:rounded-lg">
             <table className="w-full text-sm text-left text-gray-500">
@@ -59,7 +123,6 @@ const SpecialistManagement = ({ specialists, specialistRefetch }) => {
                   <th scope="col" className="px-6 py-3">
                     Name
                   </th>
-
                   <th scope="col" className="px-6 py-3">
                     Email
                   </th>
@@ -94,9 +157,7 @@ const SpecialistManagement = ({ specialists, specialistRefetch }) => {
                         {index + 1}
                       </th>
                       <td className="px-6 py-4">{`${specialist.fname} ${specialist.lname}`}</td>
-
                       <td className="px-6 py-4">{specialist.email}</td>
-
                       {specialist.qualification ? (
                         <td className="px-6 py-4">
                           {specialist.qualification}
@@ -104,7 +165,6 @@ const SpecialistManagement = ({ specialists, specialistRefetch }) => {
                       ) : (
                         <td className="px-6 py-4">none</td>
                       )}
-
                       {specialist.specialization ? (
                         <td className="px-6 py-4">
                           {specialist.specialization.name}
@@ -112,7 +172,6 @@ const SpecialistManagement = ({ specialists, specialistRefetch }) => {
                       ) : (
                         <td className="px-6 py-4">none</td>
                       )}
-
                       {specialist.certificate ? (
                         <td className="px-6 py-4">
                           {specialist.certificate && (
@@ -129,7 +188,6 @@ const SpecialistManagement = ({ specialists, specialistRefetch }) => {
                       ) : (
                         <td className="px-6 py-4">none</td>
                       )}
-
                       <td className="px-6 py-4">
                         {specialist.is_Approved === false ? (
                           <button
@@ -177,15 +235,7 @@ const SpecialistManagement = ({ specialists, specialistRefetch }) => {
                   </tr>
                 )}
               </tbody>
-
-              {selectedCertificate && (
-                <CertificateModal
-                  certificate={selectedCertificate}
-                  onClose={handleCloseModal}
-                />
-              )}
             </table>
-
             {/* Pagination */}
             <div className="mt-4 flex justify-center items-center">
               <button
@@ -234,6 +284,13 @@ const SpecialistManagement = ({ specialists, specialistRefetch }) => {
           </div>
         </section>
       </div>
+
+      {selectedCertificate && (
+        <CertificateModal
+          certificate={selectedCertificate}
+          onClose={handleCloseModal}
+        />
+      )}
     </div>
   );
 };

@@ -13,6 +13,8 @@ const Chatbox = ({ chat, currentUser, setSendMessage, receivedMessage }) => {
   const [isTyping,setIsTyping] =  useState(false)
   const [user,setUser] = useState('')
   const [receiver,setReceiver] = useState('')
+
+  
   
 
   const socket = io('http://localhost:5000')
@@ -170,7 +172,7 @@ const Chatbox = ({ chat, currentUser, setSendMessage, receivedMessage }) => {
                 >
                   <span>{message.text}</span>{" "}
                   <span className="text-xs text-gray-500 self-end">
-                  {format(message.createdAt)}
+                  {format(message.createdAt) }
                   </span>
                 </div>
               ))}

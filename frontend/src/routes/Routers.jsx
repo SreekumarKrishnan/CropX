@@ -42,7 +42,7 @@ const Routers = () => {
       <Route path='/specialist/:id' element={<ProtectedRoute allowedRoles={["farmer"]}><SpecialistDetails/></ProtectedRoute>} />
       <Route path='/user/paymentSuccess' element={<ProtectedRoute allowedRoles={["farmer"]}><PaymentSuccess/></ProtectedRoute>} />
       <Route path='/user/paymentFailed' element={<PaymentFailed/>} />
-      <Route path='/chat' element={<Chat/>} />
+      <Route path='/chat' element={<ProtectedRoute allowedRoles={["farmer","specialist"]}><Chat/></ProtectedRoute>} />
       <Route path='/unauthorized' element={<Unauthorized />} />
       <Route path='*' element={<PageNotFound />} />
       

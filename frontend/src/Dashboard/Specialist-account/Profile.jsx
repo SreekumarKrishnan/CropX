@@ -101,6 +101,7 @@ const Profile = ({ user }) => {
       toast.success(result.message);
       navigate("/specialist/profile");
     } catch (error) {
+      
       toast.error(error.response.data.message);
       setLoading(false);
     }

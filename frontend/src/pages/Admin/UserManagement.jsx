@@ -1,12 +1,10 @@
 import React, { useState } from "react";
-import { BASE_URL } from "../../config";
-
 import axiosInstance from "../../axiosConfig";
 
 const UserManagement = ({ users, userRefetch }) => {
-
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const handleBlock = async (id) => {
     try {
@@ -18,18 +16,36 @@ const UserManagement = ({ users, userRefetch }) => {
     userRefetch();
   };
 
+  const handleSearch = (e) => {
+    setCurrentPage(1); // Reset current page when searching
+    setSearchTerm(e.target.value);
+  };
+
+  const filteredUsers = users.filter((user) =>
+    `${user.fname} ${user.lname}`.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = users.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <div className="flex flex-col items-center">
-      {/* Navbar Component */}
-      {/* Assuming there's a component named Navbar */}
+      {/* Search Input */}
+      <div className="mt-4 mb-2 ml-auto">
+        <input
+          type="text"
+          placeholder="Search by name"
+          value={searchTerm}
+          onChange={handleSearch}
+          className="px-4 py-2 border rounded"
+        />
+      </div>
 
-      <div className="col-span-3 ">
+      {/* Table and Pagination */}
+      <div className="col-span-3">
         <section className="container">
           <div className="relative mx-5 overflow-x-auto shadow-md sm:rounded-lg">
             <table className="w-full text-sm text-left text-gray-500">
@@ -41,7 +57,6 @@ const UserManagement = ({ users, userRefetch }) => {
                   <th scope="col" className="px-6 py-3">
                     Name
                   </th>
-
                   <th scope="col" className="px-6 py-3">
                     Email
                   </th>
@@ -64,7 +79,6 @@ const UserManagement = ({ users, userRefetch }) => {
                         {index + 1}
                       </th>
                       <td className="px-6 py-4">{`${user.fname} ${user.lname}`}</td>
-
                       <td className="px-6 py-4">{user.email}</td>
                       <td className="px-6 py-4">
                         {user.is_Blocked ? (
@@ -111,7 +125,7 @@ const UserManagement = ({ users, userRefetch }) => {
               </button>
               <ul className="pagination flex space-x-2">
                 {Array.from({
-                  length: Math.ceil(users.length / itemsPerPage),
+                  length: Math.ceil(filteredUsers.length / itemsPerPage),
                 }).map((_, index) => (
                   <li
                     key={index}
@@ -132,20 +146,19 @@ const UserManagement = ({ users, userRefetch }) => {
                 onClick={() => paginate(currentPage + 1)}
                 className={`page-link ${
                   currentPage ===
-                  Math.ceil(users.length / itemsPerPage)
+                  Math.ceil(filteredUsers.length / itemsPerPage)
                     ? "disabled"
                     : ""
                 } ml-5`}
                 disabled={
                   currentPage ===
-                  Math.ceil(users.length / itemsPerPage)
+                  Math.ceil(filteredUsers.length / itemsPerPage)
                 }
               >
                 {">>"}
               </button>
             </div>
             {/* Pagination end */}
-
           </div>
         </section>
       </div>

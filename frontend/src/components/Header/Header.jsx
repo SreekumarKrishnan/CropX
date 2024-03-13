@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import logo from "../../assets/images/logo.png";
 import altDp from "../../assets/images/altDp.png";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import { BiMenu } from "react-icons/bi";
 import { authContext } from "../../context/AuthContext";
 import { HiMiniChatBubbleLeftRight } from "react-icons/hi2";
@@ -71,9 +71,14 @@ const Header = () => {
     }
   };
 
+  const navigate = useNavigate()
+
   const handleLogout = () => {
     dispatch({ type: "LOGOUT" });
+    
+    navigate("/login")
     location.reload();
+    
   }; 
 
   useEffect(() => {

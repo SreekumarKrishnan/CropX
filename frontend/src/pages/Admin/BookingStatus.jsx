@@ -5,10 +5,19 @@ const BookingStatus = ({ bookings, specialistRefetch }) => {
   const [paymentStatus, setPaymentStatus] = useState("Unpaid");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
+  const [selectedDate, setSelectedDate] = useState(null);
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = bookings.slice(indexOfFirstItem, indexOfLastItem);
+
+  const currentItems = bookings
+    .filter((data) => {
+      // Check if there's a selected date and filter accordingly
+      return (
+        !selectedDate || data.appointmentDate.split("T")[0] === selectedDate
+      );
+    })
+    .slice(indexOfFirstItem, indexOfLastItem);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
@@ -19,7 +28,22 @@ const BookingStatus = ({ bookings, specialistRefetch }) => {
 
       <div className="col-span-3 ">
         <section className="container">
+          {/* Add a date picker or input field for date selection */}
+          
+
           <div className="relative mx-5 overflow-x-auto shadow-md sm:rounded-lg">
+
+          <div className="flex items-center justify-end mb-4">
+            <label className="mr-2 text-gray-500">Select Date:</label>
+            <input
+              type="date"
+              value={selectedDate || ""}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="text-right"
+            />
+          </div>
+
+
             <table className="w-full text-sm text-left text-gray-500">
               <thead className="text-xs text-gray-700 uppercase bg-slate-400">
                 <tr>
@@ -29,7 +53,6 @@ const BookingStatus = ({ bookings, specialistRefetch }) => {
                   <th scope="col" className="px-6 py-3">
                     Farmer Name
                   </th>
-
                   <th scope="col" className="px-6 py-3">
                     Specialist Name
                   </th>
@@ -73,7 +96,6 @@ const BookingStatus = ({ bookings, specialistRefetch }) => {
                         {index + 1}
                       </th>
                       <td className="px-6 py-4">{`${data.user.fname} ${data.user.lname}`}</td>
-
                       <td className="px-6 py-4">{`${data.specialist.fname} ${data.specialist.lname}`}</td>
 
                       <td className="px-6 py-4">

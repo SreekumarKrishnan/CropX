@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axiosInstance from "../../axiosConfig";
 import { toast } from "react-toastify";
-import {IoMdCloseCircle} from 'react-icons/io'
+import { IoMdCloseCircle } from "react-icons/io";
 
 const SpecializationManagement = ({
   specializations,
@@ -16,7 +16,7 @@ const SpecializationManagement = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
 
-  const icon = <IoMdCloseCircle />
+  const icon = <IoMdCloseCircle />;
 
   const [validationError, setValidationError] = useState("");
 
@@ -25,7 +25,7 @@ const SpecializationManagement = ({
 
     if (!name || !description) {
       setValidationError(
-        "Please fill all the fields for successfull registration"
+        "Please fill all the fields for successful registration"
       );
 
       return false;
@@ -61,14 +61,31 @@ const SpecializationManagement = ({
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredSpecializations = specializations.filter(
+    (specialization) =>
+      specialization.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      specialization.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1); // Reset pagination when searching
+  };
+
   return (
     <div className="flex flex-col items-center">
-      {/* Navbar Component */}
-      {/* Assuming there's a component named Navbar */}
-
       <div className="col-span-3 ">
         <section className="container">
-          <div className="flex justify-end">
+          <div className="flex justify-end mb-3">
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchTerm}
+              onChange={handleSearch}
+              className="px-2 py-1 mb-5 border rounded mr-2"
+            />
             <button
               className="px-4 py-2 mb-5 mr-5 font-semibold text-white bg-green-500 border border-red-500 rounded hover:bg-red-800 hover:text-white hover:border-transparent"
               onClick={() => setIsModalOpen(true)}
@@ -149,15 +166,14 @@ const SpecializationManagement = ({
                     <th scope="col" className="px-6 py-3">
                       Name
                     </th>
-
                     <th scope="col" className="px-6 py-3">
                       Description
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {currentItems && currentItems.length > 0 ? (
-                    currentItems.map((specialization, index) => (
+                  {filteredSpecializations && filteredSpecializations.length > 0 ? (
+                    filteredSpecializations.map((specialization, index) => (
                       <tr
                         className="bg-white border-b hover:bg-[#e8e8ff]"
                         key={specialization._id}
@@ -171,7 +187,6 @@ const SpecializationManagement = ({
                         <td className="px-6 py-4 w-1/4">
                           {specialization.name}
                         </td>
-
                         <td className="px-6 py-4">
                           {specialization.description}
                         </td>
@@ -203,7 +218,7 @@ const SpecializationManagement = ({
                 </button>
                 <ul className="pagination flex space-x-2">
                   {Array.from({
-                    length: Math.ceil(specializations.length / itemsPerPage),
+                    length: Math.ceil(filteredSpecializations.length / itemsPerPage),
                   }).map((_, index) => (
                     <li
                       key={index}
@@ -224,13 +239,13 @@ const SpecializationManagement = ({
                   onClick={() => paginate(currentPage + 1)}
                   className={`page-link ${
                     currentPage ===
-                    Math.ceil(specializations.length / itemsPerPage)
+                    Math.ceil(filteredSpecializations.length / itemsPerPage)
                       ? "disabled"
                       : ""
                   } ml-5`}
                   disabled={
                     currentPage ===
-                    Math.ceil(specializations.length / itemsPerPage)
+                    Math.ceil(filteredSpecializations.length / itemsPerPage)
                   }
                 >
                   {">>"}

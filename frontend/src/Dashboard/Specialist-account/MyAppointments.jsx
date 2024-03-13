@@ -1,70 +1,76 @@
 import React, { useContext, useEffect, useState } from "react";
 import { formateDate } from "../../utils/formateDate";
-import axiosInstance from "../../axiosConfig"
+import axiosInstance from "../../axiosConfig";
 import { toast } from "react-toastify";
 import { authContext } from "../../context/AuthContext";
-import io from "socket.io-client"
+import io from "socket.io-client";
 
-const socket = io("http://localhost:5000")
+const socket = io("http://localhost:5000");
 
 const MyAppointments = ({ bookingData, refetch }) => {
-  const [statusValues, setStatusValues] = useState({}); 
+  const [statusValues, setStatusValues] = useState({});
   const [showDropdowns, setShowDropdowns] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
+  const [selectedDate, setSelectedDate] = useState(null);
 
   const { user, role, token, dispatch } = useContext(authContext);
-
 
   const toggleDropdown = (index) => {
     setShowDropdowns((prev) => ({ ...prev, [index]: !prev[index] }));
   };
 
-  const cancelBooking = async(id, userId, specialistId, index) => {
+  const cancelBooking = async (id, userId, specialistId, index) => {
     setStatusValues((prev) => ({ ...prev, [index]: "Cancel" }));
     try {
       const res = await axiosInstance.patch(
         `booking/cancelBooking/${id}/${specialistId}`
-      )
-      
-      const data ={
-        userId : userId,
-        message : `${user.fname} ${user.lname } cancelled your booking`
-      }
+      );
+
+      const data = {
+        userId: userId,
+        message: `${user.fname} ${user.lname} cancelled your booking`,
+      };
 
       const notiResponse = await axiosInstance.post(
         "/notification/create",
         data
-      )
+      );
 
-      const result = res.data
-      toast.success(result.message)
+      const result = res.data;
+      toast.success(result.message);
     } catch (error) {
       toast.error(error.response.data.message);
     }
-    refetch()
+    refetch();
   };
-  const completeBooking = async(id, index) => {
+
+  const completeBooking = async (id, index) => {
     setStatusValues((prev) => ({ ...prev, [index]: "Complete" }));
     try {
       const res = await axiosInstance.put(
         `specialist/completeBooking/${id}`
-      )
-      const result = res.data
-      toast.success(result.message)
+      );
+      const result = res.data;
+      toast.success(result.message);
     } catch (error) {
       toast.error(error.response.data.message);
     }
-    refetch()
+    refetch();
   };
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = bookingData.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = bookingData
+    .filter((data) => {
+      // Check if there's a selected date and filter accordingly
+      return !selectedDate || data.appointmentDate.split("T")[0] === selectedDate;
+    })
+    .slice(indexOfFirstItem, indexOfLastItem);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  socket.emit("specialist-cancel")
+  socket.emit("specialist-cancel");
 
   return (
     <div className="flex flex-col items-center">
@@ -73,7 +79,22 @@ const MyAppointments = ({ bookingData, refetch }) => {
 
       <div className="col-span-3">
         <section className="container" style={{ marginTop: "100px" }}>
+
+       
+
           <div className="relative mx-5 overflow-x-auto shadow-md sm:rounded-lg">
+            {/* Add a date picker or input field for date selection */}
+            
+            <div className="flex items-center justify-end mb-4">
+            <label className="mr-2 text-gray-500">Select Date:</label>
+            <input
+              type="date"
+              value={selectedDate || ""}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="text-right"
+            />
+          </div>
+
             <table className="w-full text-sm text-left text-gray-500">
               <thead className="text-xs text-gray-700 uppercase bg-slate-400">
                 <tr>
@@ -131,7 +152,7 @@ const MyAppointments = ({ bookingData, refetch }) => {
                       <td className="px-6 py-4 text-blue-500">
                         {data.isCancelledBy}
                       </td>
-                      
+
                       <td className="px-6 py-4">
                         <div className="flex relative">
                           <button
@@ -153,7 +174,12 @@ const MyAppointments = ({ bookingData, refetch }) => {
                                     : "text-gray-500"
                                 } block px-4 py-2`}
                                 onClick={() => {
-                                  cancelBooking(data._id, data.user._id, data.specialist._id, index);
+                                  cancelBooking(
+                                    data._id,
+                                    data.user._id,
+                                    data.specialist._id,
+                                    index
+                                  );
                                   toggleDropdown(index);
                                 }}
                               >
@@ -181,10 +207,10 @@ const MyAppointments = ({ bookingData, refetch }) => {
                 ) : (
                   <tr className="bg-white border-b hover:bg-gray-100">
                     <td
-                      colSpan={6} // Fix the colspan value to match the number of columns
+                      colSpan={7} // Adjust the colspan value to match the number of columns
                       className="px-6 py-4 font-medium text-center text-gray-900"
                     >
-                      No Appontments found
+                      No Appointments found
                     </td>
                   </tr>
                 )}
@@ -238,8 +264,6 @@ const MyAppointments = ({ bookingData, refetch }) => {
               </button>
             </div>
             {/* Pagination end */}
-
-
           </div>
         </section>
       </div>

@@ -36,6 +36,10 @@ export const restrict = roles=> async(req,res,next)=>{
         if(specialist){
             user = specialist
         }
+
+        if(user.is_Blocked){
+            return res.status(401).json({success:false,message:"You are not authorised"})
+        }
          
         if(!roles.includes(user.role)){
             return res.status(401).json({success:false,message:"You are not authorised"})

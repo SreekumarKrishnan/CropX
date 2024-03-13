@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import axiosInstance from "../../../axiosConfig"
+import {format} from "timeago.js"
 
 const Conversation = ({ data, currentUser, online }) => {
   const [userData, setUserData] = useState(null);
-  console.log(data)
+  
 
   useEffect(() => {
     const getUserData = async () => {
@@ -14,7 +15,7 @@ const Conversation = ({ data, currentUser, online }) => {
         const response = await axiosInstance.post("/chat/findUserForChat", JSON.stringify({ userId }))
   
         const userData = response.data?.data
-        console.log(userData);
+        
 
         setUserData(userData);
        

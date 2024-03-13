@@ -13,6 +13,9 @@ import walletRoute from "./routes/wallet.js"
 import notificationRoute from "./routes/notification.js"
 import http from "http"
 import { Server } from "socket.io"
+import path from "path"
+const currentWorkingDir = path.resolve();
+const parentDir = path.dirname(currentWorkingDir)
 
 const app = express()
 import dotenv from 'dotenv'
@@ -89,6 +92,21 @@ app.use('/api/v1/message', messageRoute)
 app.use('/api/v1/booking', bookingRoute ) 
 app.use('/api/v1/wallet', walletRoute )
 app.use('/api/v1/notification', notificationRoute)  
+
+const enviornment = "production"
+
+if (enviornment === 'production') { 
+    const __dirname = path.resolve();
+    app.use(express.static(path.join(parentDir, '/frontend/dist')));
+  
+    app.get('*', (req, res) =>
+      res.sendFile(path.resolve(parentDir, 'frontend', 'dist', 'index.html'))
+    );
+  } else {
+    app.get('/', (req, res) => {
+      res.send('API is running....');
+    });
+  }
 
 const port = process.env.PORT
 

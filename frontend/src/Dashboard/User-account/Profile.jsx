@@ -67,7 +67,7 @@ const Profile = ({ user }) => {
       
 
       const res = await axiosInstance.put(`/user/updateUser/${user._id}`, formData);
-
+      
       const result = res.data;
 
       
