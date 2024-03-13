@@ -5,7 +5,7 @@ import axiosInstance from "../../axiosConfig"
 import io from "socket.io-client"
 import { authContext } from "../../context/AuthContext";
 
-const socket = io("http://localhost:5000")
+const socket = io("https://cropx.sreekumarkrishnan.live")
 
 const PaymentSuccess = () => {
 
