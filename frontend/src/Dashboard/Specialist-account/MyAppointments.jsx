@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { authContext } from "../../context/AuthContext";
 import io from "socket.io-client";
 
-const socket = io("https://cropx.sreekumarkrishnan.live");
+const socket = io(import.meta.env.VITE_DOMIAN);
 
 const MyAppointments = ({ bookingData, refetch }) => {
   const [statusValues, setStatusValues] = useState({});

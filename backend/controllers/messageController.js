@@ -1,9 +1,11 @@
+import { incMessageCount } from "../database/repository/chatDBInteract.js";
 import { createMessage, getMessgeOfPerson } from "../database/repository/messageDBInteract.js";
 
 export const addMessage = async(req,res)=>{
     const {chatId , senderId, text} = req.body
     try {
         const result = await createMessage(chatId,senderId,text)
+        await incMessageCount(chatId)
         res.status(200).json({
             success: true,
             message: "message added successfully",

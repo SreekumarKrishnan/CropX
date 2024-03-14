@@ -5,7 +5,7 @@ import axiosInstance from "../../axiosConfig"
 import io from "socket.io-client"
 import { authContext } from "../../context/AuthContext";
 
-const socket = io("https://cropx.sreekumarkrishnan.live")
+const socket = io(import.meta.env.VITE_DOMIAN)
 
 const PaymentSuccess = () => {
 

@@ -3,8 +3,10 @@ import {
   findUsersChats,
   findChatOneToOne,
 } from "../database/repository/chatDBInteract.js";
-import { findUser } from "../database/repository/userDBInteact.js";
-import { findSpecialistById } from "../database/repository/specialistDBInteract.js";
+import { findUser, updateUser } from "../database/repository/userDBInteact.js";
+import { findSpecialistById, updateSpecialistById } from "../database/repository/specialistDBInteract.js";
+
+
 
 export const createChat = async (req, res) => {
   const senderId = req.body.senderId;
@@ -89,3 +91,28 @@ export const findUserForChat = async (req, res) => {
     return res.status(500).json({ message: "An error occurred" });
   }
 };
+
+export const updateLastSeen = async (req,res)=>{
+  const { userId, lastSeenTime } = req.body
+  console.log('userId:',userId,lastSeenTime)
+  try { 
+    
+    const farmer = await findUser(userId)
+    const specialist = await findSpecialistById(userId)
+    if(farmer){
+      await updateUser(userId,{lastSeen : lastSeenTime})
+    }
+    if(specialist){
+      await updateSpecialistById(userId,{lastSeen : lastSeenTime})
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "last seen updated",
+      
+    });
+
+  } catch (error) {
+    return res.status(500).json({ message: "last seen updation failed" });
+  }
+}

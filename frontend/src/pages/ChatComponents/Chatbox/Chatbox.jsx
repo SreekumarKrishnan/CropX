@@ -17,7 +17,7 @@ const Chatbox = ({ chat, currentUser, setSendMessage, receivedMessage }) => {
   
   
 
-  const socket = io('https://cropx.sreekumarkrishnan.live')
+  const socket = io(import.meta.env.VITE_DOMIAN)
 
   
 

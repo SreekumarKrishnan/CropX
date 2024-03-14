@@ -1,33 +1,50 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import axiosInstance from "../../../axiosConfig"
-import {format} from "timeago.js"
+import axiosInstance from "../../../axiosConfig";
+
+import { io } from "socket.io-client";
+
+const socket = io(import.meta.env.VITE_DOMIAN);
 
 const Conversation = ({ data, currentUser, online }) => {
   const [userData, setUserData] = useState(null);
-  
+  const [lastSeen, setLastSeen] = useState();
 
   useEffect(() => {
     const getUserData = async () => {
       try {
         const userId = data.members.find((id) => id !== currentUser);
-  
-        const response = await axiosInstance.post("/chat/findUserForChat", JSON.stringify({ userId }))
-  
-        const userData = response.data?.data
-        
 
+        const response = await axiosInstance.post(
+          "/chat/findUserForChat",
+          JSON.stringify({ userId })
+        );
+
+        const userData = response.data?.data;
         setUserData(userData);
-       
+
+        if (userData) {
+          setLastSeen(userData.lastSeen);
+        }
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        console.error("Error fetching user data:", error);
       }
     };
-  
-    getUserData();
-  }, [data.members, currentUser]);
-  
 
+    getUserData();
+  }, []);
+
+  useEffect(() => {
+    socket.on("sentLastSeen", ({ lastSeen, userid }) => {
+      
+      if (userData) {
+        if (userData._id == userid) {
+          
+          setLastSeen(lastSeen);
+        }
+      }
+    });
+  }, []);
 
   return (
     <>
@@ -36,22 +53,30 @@ const Conversation = ({ data, currentUser, online }) => {
           <div className="bg-green-500 rounded-full w-4 h-4 md:w-2 md:h-2"></div>
         )}
         <img
-          src={
-            userData?.photo ||
-            userData?.photo
-          }
+          src={userData?.photo || userData?.photo}
           alt="Profile"
           className="followerImage w-12 h-12 md:w-16 md:h-16 rounded-full object-cover"
         />
         <div className="text-sm">
           <span className="font-semibold text-gray-800">
-            {userData?.fname ||
-              userData?.fname}
+            {userData?.fname || userData?.fname}
           </span>
           <br />
-          <span className={online ? "text-green-500" : "text-gray-500"}>
-            {online ? "Online" : "Offline"}
-          </span>
+          {userData ? (
+            <span className={online ? "text-green-500" : "text-gray-500"}>
+              {online
+                ? "Online"
+                : userData.lastSeen
+                ? `${Math.floor(
+                    (new Date() - new Date(lastSeen)) / (1000 * 60)
+                  )} minutes ago`
+                : "Offline"}
+            </span>
+          ) : (
+            <span className={online ? "text-green-500" : "text-gray-500"}>
+              {online ? "Online" : "Offline"}
+            </span>
+          )}
         </div>
       </div>
       <hr className="w-5/6 md:w-11/12 mx-auto border-t border-gray-300 my-4" />
@@ -60,10 +85,9 @@ const Conversation = ({ data, currentUser, online }) => {
 };
 
 Conversation.propTypes = {
-  data: PropTypes.object.isRequired, 
+  data: PropTypes.object.isRequired,
   currentUser: PropTypes.string.isRequired,
   online: PropTypes.bool.isRequired,
 };
-
 
 export default Conversation;

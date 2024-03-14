@@ -34,6 +34,8 @@ const io = new Server(server, {
 let activeUsers = []; 
 
 io.on("connection", (socket) => {
+
+  
   // add new User
   socket.on("new-user-add", (newUserId) => {
     if (!activeUsers.some((user) => user.userId === newUserId)) {
@@ -71,6 +73,14 @@ io.on("connection", (socket) => {
   socket.on("user-cancel",()=>{
     io.emit("notify-user-cancel")
   })
+
+  socket.on('lastSeen',(lastSeen,userid)=>{
+    
+    socket.join(userid)
+
+      io.emit("sentLastSeen", {lastSeen,userid});
+  
+})
  
 });
 

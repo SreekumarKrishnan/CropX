@@ -31,3 +31,17 @@ export const findChatOneToOne = async(firstId,secondId)=>{
     console.log(error);
   }
 }
+
+export const incMessageCount = async (chatId) => {
+  try {
+    const result = await Chat.findByIdAndUpdate(
+      chatId,
+      { $inc: { messageCount: 1 } },
+      { new: true } 
+    );
+    return result;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};

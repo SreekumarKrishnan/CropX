@@ -1,9 +1,10 @@
 import { useRef, useState, useEffect } from "react";
 import Conversation from "../Conversation/Conversation";
 import "./Chat.css";
-import { io } from "socket.io-client";
 import ChatBox from "../Chatbox/Chatbox";
 import axiosInstance from "../../../axiosConfig"
+import { io } from "socket.io-client";
+
 
 
 
@@ -16,8 +17,10 @@ const Chat = () => {
   const [currentChat, setCurrentChat] = useState(null);
   const [sendMessage, setSendMessage] = useState(null);
   const [receivedMessage, setReceivedMessage] = useState(null);
+  const [top, setTop] = useState(false)
   
   const socket = useRef();
+  const socketEmit = io(import.meta.env.VITE_DOMIAN)
 
   
 
@@ -59,7 +62,7 @@ const Chat = () => {
     };
 
     getChats();
-  }, [userInfo, specialistInfo]);
+  }, [userInfo, specialistInfo, top]);
 
   useEffect(() => {
     socket.current = io("wss://cropx.sreekumarkrishnan.live");
@@ -76,7 +79,19 @@ const Chat = () => {
 
     socket.current.on("receive-message", (data) => {
       setReceivedMessage(data);
+      setTop(!top)
     });
+
+    socket.current.on('disconnect',()=>{
+      const lastSeenTime = new Date()
+      socketEmit.emit('lastSeen',lastSeenTime,userId)
+
+      console.log('userId:',userId,lastSeenTime)
+      const updateLastSeen = async()=>{
+        await axiosInstance.patch('/chat/updateLastSeen',{userId,lastSeenTime})
+      }
+      updateLastSeen()
+    })
 
     return () => {
       socket.current.disconnect();

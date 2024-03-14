@@ -23,6 +23,7 @@ const SpecialistSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  lastSeen: { type : Date , required : false }
 }); 
 
 export default mongoose.model("Specialist", SpecialistSchema);
