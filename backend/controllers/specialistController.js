@@ -133,6 +133,7 @@ export const addSlot = async (req, res) => {
   }
 };
 export const deleteSlot = async (req, res) => {
+ 
   const id = req.params.id;
   const data1 = req.body.data.slotDate;
   const data2 = req.body.data.slotTime;

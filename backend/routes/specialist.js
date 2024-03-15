@@ -60,7 +60,7 @@ router.put(
   authenticate,
   restrict(["specialist"]),
   deleteSlot 
-);
+); 
 
 router.put(
   "/completeBooking/:id",

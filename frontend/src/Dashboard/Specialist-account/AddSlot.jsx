@@ -28,8 +28,6 @@ const AddSlot = ({ user, userRefetch }) => {
       is_Booked: false,
     },
   ]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [slotsPerPage] = useState(5); // Change this based on the number of slots you want to show per page
 
   useEffect(() => {}, [slotData]);
 
@@ -99,7 +97,7 @@ const AddSlot = ({ user, userRefetch }) => {
 
       userRefetch();
       toast.success(result.message);
-      // navigate("/specialist/profile"); // Uncomment this line if needed
+      navigate("/specialist/profile");
     } catch (error) {
       toast.error(error.response.data.message);
     }
@@ -126,23 +124,11 @@ const AddSlot = ({ user, userRefetch }) => {
       const result = res.data;
       userRefetch();
       toast.success(result.message);
-      // navigate("/specialist/profile"); // Uncomment this line if needed
+      navigate("/specialist/profile");
     } catch (error) {
       toast.error(error.response.data.message);
     }
   };
-
-  const indexOfLastSlot = currentPage * slotsPerPage;
-  const indexOfFirstSlot = indexOfLastSlot - slotsPerPage;
-  const currentSlots =
-    user &&
-    user.slot.length &&
-    user.slot
-      .flat() // Flatten the array of arrays
-      .filter((slot) => new Date(slot.slotDate) >= new Date()) // Only show slots after the current date
-      .slice(indexOfFirstSlot, indexOfLastSlot);
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <div className="mb-5 mt-5">
@@ -212,6 +198,9 @@ const AddSlot = ({ user, userRefetch }) => {
       </button>
 
       <div className="flex flex-col items-center">
+        {/* Navbar Component */}
+        {/* Assuming there's a component named Navbar */}
+
         <div className="col-span-3 ">
           <section className="container">
             <div className="relative mx-5 overflow-x-auto shadow-md sm:rounded-lg">
@@ -224,6 +213,7 @@ const AddSlot = ({ user, userRefetch }) => {
                     <th scope="col" className="px-6 py-3">
                       Slot Date
                     </th>
+
                     <th scope="col" className="px-6 py-3">
                       Slot Time
                     </th>
@@ -236,43 +226,47 @@ const AddSlot = ({ user, userRefetch }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {currentSlots.length ? (
-                    currentSlots.map((slot, index) => (
-                      <tr
-                        key={index}
-                        className="bg-white border-b hover:bg-[#e8e8ff]"
-                      >
-                        <th
-                          scope="row"
-                          className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
-                        >
-                          {count++}
-                        </th>
-                        <td className="px-6 py-4">
-                          {slot.slotDate.split("T")[0]}
-                        </td>
-                        <td className="px-6 py-4">{slot.slotTime}</td>
-                        <td className="px-6 py-4">
-                          {slot.is_Booked === true ? (
-                            <p className="text-red-500">Slot booked</p>
-                          ) : (
-                            <p className="text-green-500">Slot allotted</p>
-                          )}
-                        </td>
-                        <td className="px-6 py-4">
-                          <button
-                            onClick={() => handleDelete(index)}
-                            className="px-4 py-2 font-semibold text-white bg-red-500 border border-yellow-500 rounded hover:bg-yellow-500 hover:text-white hover:border-transparent"
+                  {user && user.slot.length ? (
+                    user.slot.map((slotGroup, index) =>
+                      slotGroup
+                        .filter((slot) => new Date(slot.slotDate) >= new Date()) // Only show slots after the current date
+                        .map((slot, index1) => (
+                          <tr
+                            key={index}
+                            className="bg-white border-b hover:bg-[#e8e8ff]"
                           >
-                            Delete
-                          </button>
-                        </td>
-                      </tr>
-                    ))
+                            <th
+                              scope="row"
+                              className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
+                            >
+                              {count++}
+                            </th>
+                            <td className="px-6 py-4">
+                              {slot.slotDate.split("T")[0]}
+                            </td>
+                            <td className="px-6 py-4">{slot.slotTime}</td>
+                            <td className="px-6 py-4">
+                              {slot.is_Booked === true ? (
+                                <p className="text-red-500">Slot booked</p>
+                              ) : (
+                                <p className="text-green-500">Slot allotted</p>
+                              )}
+                            </td>
+                            <td className="px-6 py-4">
+                              <button
+                                onClick={() => handleDelete(index, index1)}
+                                className="px-4 py-2 font-semibold text-white bg-red-500 border border-yellow-500 rounded hover:bg-yellow-500 hover:text-white hover:border-transparent"
+                              >
+                                Delete
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                    )
                   ) : (
                     <tr className="bg-white border-b hover:bg-gray-100">
                       <td
-                        colSpan={5} // Adjust the colspan value to match the number of columns
+                        colSpan={6} // Fix the colspan value to match the number of columns
                         className="px-6 py-4 font-medium text-center text-gray-900"
                       >
                         No slots found
@@ -285,54 +279,6 @@ const AddSlot = ({ user, userRefetch }) => {
           </section>
         </div>
       </div>
-
-      {/* Pagination */}
-      <div className="mt-4 flex justify-center items-center">
-        <button
-          onClick={() => paginate(currentPage - 1)}
-          className={`page-link ${
-            currentPage === 1 ? "disabled" : ""
-          } mr-5`}
-          disabled={currentPage === 1}
-        >
-          {"<<"}
-        </button>
-        <ul className="pagination flex space-x-2">
-          {Array.from({
-            length: Math.ceil(user.slot.length / slotsPerPage),
-          }).map((_, index) => (
-            <li
-              key={index}
-              className={`page-item ${
-                index + 1 === currentPage ? "active" : ""
-              }`}
-            >
-              <button
-                onClick={() => paginate(index + 1)}
-                className="page-link"
-              >
-                {index + 1}
-              </button>
-            </li>
-          ))}
-        </ul>
-        <button
-          onClick={() => paginate(currentPage + 1)}
-          className={`page-link ${
-            currentPage ===
-            Math.ceil(user.slot.flat().length / slotsPerPage)
-              ? "disabled"
-              : ""
-          } ml-5`}
-          disabled={
-            currentPage ===
-            Math.ceil(user.slot.flat().length / slotsPerPage)
-          }
-        >
-          {">>"}
-        </button>
-      </div>
-      {/* Pagination end */}
     </div>
   );
 };
