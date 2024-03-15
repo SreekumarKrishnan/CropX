@@ -25,7 +25,7 @@ dotenv.config()
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "https://cropx.sreekumarkrishnan.live",
+    origin: "https://cropx.sreekumarkrishnan.live/",
   },
 });
 

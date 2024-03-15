@@ -65,7 +65,7 @@ const Chat = () => {
   }, [userInfo, specialistInfo, top]);
 
   useEffect(() => {
-    socket.current = io("wss://cropx.sreekumarkrishnan.live");
+    socket.current = io("wss://cropx.sreekumarkrishnan.live/");
 
     const userId = userInfo?._id || specialistInfo?._id;
 

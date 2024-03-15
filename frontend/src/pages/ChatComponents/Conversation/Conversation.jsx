@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import axiosInstance from "../../../axiosConfig";
+import {format} from "timeago.js"
+
 
 import { io } from "socket.io-client";
 
@@ -44,7 +46,7 @@ const Conversation = ({ data, currentUser, online }) => {
         }
       }
     });
-  }, []);
+  }, [lastSeen]);
 
   return (
     <>
@@ -64,14 +66,13 @@ const Conversation = ({ data, currentUser, online }) => {
           <br />
           {userData ? (
             <span className={online ? "text-green-500" : "text-gray-500"}>
-              {online
-                ? "Online"
-                : userData.lastSeen
-                ? `${Math.floor(
-                    (new Date() - new Date(lastSeen)) / (1000 * 60)
-                  )} minutes ago`
-                : "Offline"}
-            </span>
+  {online
+    ? "Online"
+    : userData.lastSeen
+    ? `${format(lastSeen)} `
+    : "Offline"}
+</span>
+
           ) : (
             <span className={online ? "text-green-500" : "text-gray-500"}>
               {online ? "Online" : "Offline"}
