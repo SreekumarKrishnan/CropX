@@ -87,6 +87,7 @@ const SidePanel = ({ specialist, id, userId }) => {
               )}
             </ul>
           </div>
+          
         </div>
       )}
 

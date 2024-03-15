@@ -4,9 +4,7 @@ import Home from '../pages/Home'
 import Login from '../pages/Login'
 import Signup from '../pages/Signup'
 import Services from '../pages/Services'
-import Contact from '../pages/Contact'
 import Specialists from '../pages/Specialists/Specialists'
-import SpecialistCard from '../pages/Specialists/SpecialistCard'
 import SpecialistSignup from '../pages/SpecialistSignup'
 import AdminLogin from '../pages/Admin/AdminLogin'
 import AdminDashboard from '../pages/Admin/AdminDashboard'
@@ -33,7 +31,6 @@ const Routers = () => {
       <Route path='/signup' element={<Signup/>} />
       <Route path='/specialist/signup' element={<SpecialistSignup/>} />
       <Route path='/services' element={<Services/>} />
-      <Route path='/contact' element={<Contact/>} />
       <Route path='/specialists' element={<Specialists/>} />
       <Route path='/admin/login' element={<AdminLogin/>} />
       <Route path='/admin/dashboard' element={<ProtectedRoute allowedRoles={["admin"]}><AdminDashboard/></ProtectedRoute>} />

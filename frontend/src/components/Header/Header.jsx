@@ -22,11 +22,7 @@ const navLinks = [
   {
     path: "/specialists",
     display: "Find a Specialist",
-  },
-  {
-    path: "/contact",
-    display: "Contact",
-  },
+  }
 ];
 
 const Header = () => {
