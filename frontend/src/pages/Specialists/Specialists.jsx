@@ -11,7 +11,7 @@ const Specialists = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredSpecialists, setFilteredSpecialists] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(1);
+  const [itemsPerPage] = useState(4);
   const [selectedSpecializations, setSelectedSpecializations] = useState([]);
   const [availableSpecializations, setAvailableSpecializations] = useState([]);
 
