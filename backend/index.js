@@ -25,7 +25,7 @@ dotenv.config()
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "https://cropx.sreekumarkrishnan.live",
+    origin: "http://localhost:5173",
   },
 });
 
@@ -80,7 +80,7 @@ io.on("connection", (socket) => {
 
       io.emit("sentLastSeen", {lastSeen,userid});
   
-})
+  })
  
 });
 

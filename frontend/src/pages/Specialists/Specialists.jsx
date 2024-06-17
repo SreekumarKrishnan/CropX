@@ -70,11 +70,11 @@ const Specialists = () => {
   const handleSearch = () => {
     const filtered = specialists.filter(
       (specialist) =>
-        // existing conditions
+        
         (specialist.fname.toLowerCase().includes(searchQuery.toLowerCase()) ||
           specialist.lname.toLowerCase().includes(searchQuery.toLowerCase()) ||
           specialist.specialization.name.toLowerCase().includes(searchQuery.toLowerCase())) &&
-        // new condition for specialization filter
+        
         (selectedSpecializations.length === 0 || selectedSpecializations.includes(specialist.specialization.name))
     );
     setFilteredSpecialists(filtered);
@@ -129,7 +129,7 @@ const Specialists = () => {
             ))}
           </div>
 
-          {/* Pagination */}
+         
           <div className="mt-4 flex justify-center items-center">
             <button
               onClick={() => paginate(currentPage - 1)}

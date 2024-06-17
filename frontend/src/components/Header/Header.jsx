@@ -14,21 +14,27 @@ const socket = io(import.meta.env.VITE_DOMIAN);
 const icon = <HiMiniChatBubbleLeftRight />;
 const notification = <MdNotificationsActive />;
 
-const navLinks = [
-  {
-    path: "/home",
-    display: "Home",
-  },
-  {
-    path: "/specialists",
-    display: "Find a Specialist",
-  }
-];
+
+
 
 const Header = () => {
   const headerRef = useRef(null);
   const menuRef = useRef(null);
   const { user, role, token, dispatch } = useContext(authContext);
+
+   
+
+  const navLinks = [
+    {
+      path: "/home",
+      display: "Home",
+    },
+    {
+      path: "/specialists",
+      display: "Find a Specialist",
+    }
+  ];
+  
 
   const [notifications, setNotifications] = useState([]);
 
@@ -71,11 +77,12 @@ const Header = () => {
 
   const handleLogout = () => {
     dispatch({ type: "LOGOUT" });
-    
+    localStorage.removeItem("pageReloaded");
     navigate("/login")
     location.reload();
     
-  }; 
+  };
+   
 
   useEffect(() => {
     
@@ -134,7 +141,7 @@ const Header = () => {
                         : "text-textColor text-[16px] leading-7 font-[500] hover:text-primaryColor"
                     }
                   >
-                    {link.display}
+                    { role === 'specialist' && link.path==='/specialists' ? '' :link.display}
                   </NavLink>
                 </li>
               ))}

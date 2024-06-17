@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import axiosInstance from "../../../axiosConfig";
-import {format} from "timeago.js"
-
+import { format } from "timeago.js";
 
 import { io } from "socket.io-client";
 
@@ -11,6 +10,7 @@ const socket = io(import.meta.env.VITE_DOMIAN);
 const Conversation = ({ data, currentUser, online }) => {
   const [userData, setUserData] = useState(null);
   const [lastSeen, setLastSeen] = useState();
+
 
   useEffect(() => {
     const getUserData = async () => {
@@ -25,6 +25,9 @@ const Conversation = ({ data, currentUser, online }) => {
         const userData = response.data?.data;
         setUserData(userData);
 
+
+        console.log(userData);
+
         if (userData) {
           setLastSeen(userData.lastSeen);
         }
@@ -38,10 +41,8 @@ const Conversation = ({ data, currentUser, online }) => {
 
   useEffect(() => {
     socket.on("sentLastSeen", ({ lastSeen, userid }) => {
-      
       if (userData) {
         if (userData._id == userid) {
-          
           setLastSeen(lastSeen);
         }
       }
@@ -66,13 +67,12 @@ const Conversation = ({ data, currentUser, online }) => {
           <br />
           {userData ? (
             <span className={online ? "text-green-500" : "text-gray-500"}>
-  {online
-    ? "Online"
-    : userData.lastSeen
-    ? `${format(lastSeen)} `
-    : "Offline"}
-</span>
-
+              {online
+                ? "Online"
+                : userData.lastSeen
+                ? `${format(lastSeen)} `
+                : "Offline"}
+            </span>
           ) : (
             <span className={online ? "text-green-500" : "text-gray-500"}>
               {online ? "Online" : "Offline"}

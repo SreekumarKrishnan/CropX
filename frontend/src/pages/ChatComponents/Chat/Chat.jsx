@@ -62,10 +62,11 @@ const Chat = () => {
     };
 
     getChats();
+    
   }, [userInfo, specialistInfo, top]);
 
   useEffect(() => {
-    socket.current = io("wss://cropx.sreekumarkrishnan.live");
+    socket.current = io("ws://localhost:5000");
 
     const userId = userInfo?._id || specialistInfo?._id;
 
