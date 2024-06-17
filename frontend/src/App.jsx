@@ -6,11 +6,11 @@ import Layout from './layout/Layout'
 function App() {
 
   useEffect(() => {
-    
+    // Check if the current URL is "http://localhost:5173/"
     const reloadFlag = localStorage.getItem("pageReloaded");
 
     if (
-      (window.location.href === "https://cropx.sreekumarkrishnan.live" || window.location.href === "https://cropx.sreekumarkrishnan.live") &&
+      (window.location.href === "http://localhost:5173/" || window.location.href === "http://localhost:5173") &&
       !reloadFlag
     ) {
       localStorage.setItem("pageReloaded", "true");
