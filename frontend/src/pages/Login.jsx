@@ -1,28 +1,22 @@
-import React, { useState, useContext, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { BASE_URL } from "../config";
-import { toast } from "react-toastify";
-import { authContext } from "../context/AuthContext";
-import axiosInstance from "../axiosConfig";
-import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
-import { jwtDecode } from "jwt-decode";
-
-
-
+import React, { useState, useContext, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { BASE_URL } from '../config';
+import { toast } from 'react-toastify';
+import { authContext } from '../context/AuthContext';
+import axiosInstance from '../axiosConfig';
+import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
+import { jwtDecode } from 'jwt-decode';
 
 const Login = () => {
-
-  
-
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
+    email: '',
+    password: '',
   });
 
   const navigate = useNavigate();
 
-  const [validationError, setValidationError] = useState("");
+  const [validationError, setValidationError] = useState('');
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -39,8 +33,8 @@ const Login = () => {
   const { token, dispatch } = useContext(authContext);
 
   useEffect(() => {
-    if (token !== "null") {
-      navigate("/");
+    if (token !== 'null') {
+      navigate('/');
     }
   }, []);
 
@@ -48,12 +42,12 @@ const Login = () => {
     const { email, password } = formData;
 
     if (!email || !password) {
-      setValidationError("Please fill all the fields for successfull Login");
+      setValidationError('Please fill all the fields for successfull Login');
 
       return false;
     }
 
-    setValidationError(""); // Reset validation error if all validations pass
+    setValidationError(''); // Reset validation error if all validations pass
     return true; // All validations passed
   };
 
@@ -66,12 +60,12 @@ const Login = () => {
 
     setLoading(true);
     try {
-      const res = await axiosInstance.post("/auth/login", formData);
+      const res = await axiosInstance.post('/auth/login', formData);
 
       const result = res.data;
 
       dispatch({
-        type: "LOGIN_SUCCESS",
+        type: 'LOGIN_SUCCESS',
         payload: {
           user: result.data,
           role: result.data.role,
@@ -81,7 +75,7 @@ const Login = () => {
 
       setLoading(false);
       toast.success(result.data.message);
-      navigate("/home");
+      navigate('/home');
     } catch (error) {
       toast.error(error.response.data.message);
       setLoading(false);
@@ -109,7 +103,7 @@ const Login = () => {
 
           <div className="mb-5 relative">
             <input
-              type={showPassword ? "text" : "password"}
+              type={showPassword ? 'text' : 'password'}
               placeholder="Enter Your Password"
               name="password"
               value={formData.password}
@@ -136,7 +130,9 @@ const Login = () => {
             </button>
           </div>
 
-          <GoogleOAuthProvider clientId={import.meta.env.VITE_REACT_APP_GOOGLE_CLIENT_ID}>
+          <GoogleOAuthProvider
+            clientId={import.meta.env.VITE_REACT_APP_GOOGLE_CLIENT_ID}
+          >
             <GoogleLogin
               onSuccess={(credentialResponse) => {
                 if (credentialResponse) {
@@ -148,15 +144,12 @@ const Login = () => {
 
                   const reg = async () => {
                     try {
-                      const res = await axiosInstance.post(
-                        "/auth/login",
-                        data
-                      );
+                      const res = await axiosInstance.post('/auth/login', data);
 
                       const result = res.data;
 
                       dispatch({
-                        type: "LOGIN_SUCCESS",
+                        type: 'LOGIN_SUCCESS',
                         payload: {
                           user: result.data,
                           role: result.data.role,
@@ -166,7 +159,7 @@ const Login = () => {
 
                       setLoading(false);
                       toast.success(result.data.message);
-                      navigate("/home");
+                      navigate('/home');
                     } catch (error) {
                       toast.error(error.response.data.message);
                       setLoading(false);
@@ -177,7 +170,7 @@ const Login = () => {
                 }
               }}
               onError={() => {
-                console.log("Registration Failed");
+                console.log('Registration Failed');
               }}
             />
           </GoogleOAuthProvider>
@@ -190,6 +183,16 @@ const Login = () => {
           </p>
           {validationError && <p className="text-red-500">{validationError}</p>}
         </form>
+        <br />
+        <div class="max-w-sm mx-auto p-6 bg-white border border-gray-200 rounded-lg shadow-md">
+          <p class="text-gray-800 font-semibold">Demo Farmer: rose@gmail.com</p>
+          <p class="text-gray-600 mt-2">Demo password: Qwerty123$</p>
+        </div>
+        <br />
+        <div class="max-w-sm mx-auto p-6 bg-white border border-gray-200 rounded-lg shadow-md">
+          <p class="text-gray-800 font-semibold">Demo Specialist: alexa@gmail.com</p>
+          <p class="text-gray-600 mt-2">Demo password: Qwerty123$</p>
+        </div>
       </div>
     </section>
   );
